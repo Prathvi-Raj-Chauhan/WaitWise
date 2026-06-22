@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wait Room</title>
+</head>
+<body>
+    <h1>Waiting Room</h1>
+    <div id = "current">
+        null
+    </div>
+    <ul id = "waitList"></ul>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        const queueList = document.getElementById("waitList");
+        const currentPatientDiv = document.getElementById("current");
+        const socket = io("http://192.168.56.1:9000")
+        socket.on("connect", () => {
+            console.log("Connected", socket.id);
+        });
+        socket.on("queueUpdate", (data)=>{
+            queueList.innerHTML = ""
+            data.queue.forEach((pat) => {
+                const li = document.createElement("li")
+                li.textContent = `${pat.name} - Token - ${pat.token}`
+                queueList.append(li)
+            })
+        })
+        socket.on("currentPatient", (data) => {
+            currentPatientDiv.textContent =
+                `Token ${data.current.token} - ${data.current.name}`;
+        });
+    </script>
+</body>
+</html>
