@@ -74,11 +74,13 @@ socket.on("connection" , (sock) => {
         clinic.queue.push(patient)
         console.log("Patient Added : ", patient)
         console.log("Queue State = >" , clinic.queue)
+        console.log("Queue State = >" , clinic.consultDurations)
         broadcast(clinicId)
         ack?.({ ok: true})
     })
     sock.on("callNext", (_, ack) => {
         const clinic = getClinic(clinicId)
+        console.log("CALL NEXT REVOKED")
         if(clinic.queue.length === 0){
             return ack?.({
                 ok: false,
