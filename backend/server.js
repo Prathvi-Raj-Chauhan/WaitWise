@@ -5,7 +5,7 @@ const app = express()
 const {Server} = require("socket.io")
 const PORT = 9000
 const server = http.createServer(app)
-
+require("dotenv").config()
 app.use(cors())
 
 
