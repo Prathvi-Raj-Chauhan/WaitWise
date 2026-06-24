@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wait_wise/screens/home_screen.dart';
+import 'package:wait_wise/screens/login.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       
-      home: HomePage(),
+      home: LoginPage(),
     );
   }
 }
