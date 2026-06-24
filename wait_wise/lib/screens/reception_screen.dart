@@ -1,45 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:wait_wise/provider/provider.dart';
-
-class WW {
-  static const bg = Color(0xFF0F172A);
-  static const surface = Color(0xFF1E293B);
-  static const surfaceHigh = Color(0xFF334155);
-  static const teal = Color(0xFF14B8A6);
-  static const amber = Color(0xFFF59E0B);
-  static const red = Color(0xFFEF4444);
-  static const textPrimary = Color(0xFFF8FAFC);
-  static const textSecondary = Color(0xFF94A3B8);
-
-  static const r12 = BorderRadius.all(Radius.circular(12));
-  static const r20 = BorderRadius.all(Radius.circular(20));
-
-  static InputDecoration inputDeco(String label, {IconData? icon}) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
-      floatingLabelStyle: const TextStyle(color: Color(0xFF14B8A6), fontSize: 12),
-      prefixIcon: icon != null ? Icon(icon, color: const Color(0xFF94A3B8), size: 20) : null,
-      filled: true,
-      fillColor: const Color(0xFF1E293B),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      border: OutlineInputBorder(
-        borderRadius: r12,
-        borderSide: const BorderSide(color: Color(0xFF334155)),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: r12,
-        borderSide: const BorderSide(color: Color(0xFF334155)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: r12,
-        borderSide: const BorderSide(color: Color(0xFF14B8A6), width: 1.5),
-      ),
-    );
-  }
-}
 
 class ReceptionPage extends StatefulWidget {
   final String clinicId;
@@ -72,38 +35,48 @@ class _ReceptionPageState extends State<ReceptionPage> {
         final queue = ref.watch(queueProvider);
 
         return Scaffold(
-          backgroundColor: WW.bg,
+          backgroundColor: const Color(0xFFE3E5E8),
           appBar: AppBar(
-            backgroundColor: WW.surface,
+            backgroundColor: const Color(0xFFF5F6F7),
             elevation: 0,
             surfaceTintColor: Colors.transparent,
+            shadowColor: Colors.black.withOpacity(0.08),
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_rounded, color: WW.textSecondary),
+              icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF888888), size: 20),
               onPressed: () => Navigator.pop(context),
             ),
-            title: const Row(
+            title: Row(
               children: [
-                Icon(Icons.local_hospital_outlined, color: WW.teal, size: 18),
-                SizedBox(width: 8),
+                const Icon(Icons.local_hospital_outlined, color: Color(0xFFE8400A), size: 16),
+                const SizedBox(width: 8),
                 Text(
-                  'Receptionist',
-                  style: TextStyle(
-                    color: WW.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                  'RECEPTIONIST',
+                  style: GoogleFonts.jetBrainsMono(
+                    color: const Color(0xFF1A1A1A),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.5,
                   ),
                 ),
               ],
             ),
             actions: [
+              // Clinic ID chip
               GestureDetector(
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: widget.clinicId));
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Clinic ID copied'),
-                      duration: Duration(seconds: 1),
-                      backgroundColor: WW.teal,
+                    SnackBar(
+                      content: Text(
+                        'CLINIC ID COPIED',
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                      duration: const Duration(seconds: 1),
+                      backgroundColor: const Color(0xFFE8400A),
                     ),
                   );
                 },
@@ -111,54 +84,50 @@ class _ReceptionPageState extends State<ReceptionPage> {
                   margin: const EdgeInsets.only(right: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: WW.amber.withOpacity(0.15),
-                    borderRadius: WW.r12,
-                    border: Border.all(color: WW.amber.withOpacity(0.3), width: 1),
+                    color: const Color(0xFFECEDEF),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         widget.clinicId,
-                        style: const TextStyle(
-                          color: WW.amber,
-                          fontSize: 13,
+                        style: GoogleFonts.jetBrainsMono(
+                          color: const Color(0xFF1A1A1A),
+                          fontSize: 11,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.5,
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.copy_rounded, color: WW.amber, size: 12),
+                      const SizedBox(width: 5),
+                      const Icon(Icons.copy_rounded, color: Color(0xFF888888), size: 12),
                     ],
                   ),
                 ),
               ),
+              // Live status
               Padding(
                 padding: const EdgeInsets.only(right: 16),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 8,
-                      height: 8,
+                      width: 6,
+                      height: 6,
                       decoration: BoxDecoration(
-                        color: queue.connected ? WW.teal : WW.red,
+                        color: queue.connected ? const Color(0xFFE8400A) : const Color(0xFFBBBBBB),
                         shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: (queue.connected ? WW.teal : WW.red).withOpacity(0.5),
-                            blurRadius: 6,
-                          ),
-                        ],
                       ),
                     ),
-                    const SizedBox(width: 5),
+                    const SizedBox(width: 6),
                     Text(
-                      queue.connected ? 'Live' : 'Offline',
-                      style: TextStyle(
-                        color: queue.connected ? WW.teal : WW.red,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                      queue.connected ? 'LIVE' : 'OFFLINE',
+                      style: GoogleFonts.jetBrainsMono(
+                        color: queue.connected ? const Color(0xFFE8400A) : const Color(0xFFBBBBBB),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.0,
                       ),
                     ),
                   ],
@@ -171,19 +140,21 @@ class _ReceptionPageState extends State<ReceptionPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
+                // ── Now Serving card ──
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        WW.teal.withOpacity(0.15),
-                        WW.teal.withOpacity(0.05),
-                      ],
-                    ),
-                    borderRadius: WW.r20,
-                    border: Border.all(color: WW.teal.withOpacity(0.25), width: 1),
+                    color: const Color(0xFFF5F6F7),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        offset: const Offset(0, 4),
+                        blurRadius: 16,
+                      ),
+                    ],
                   ),
                   child: Row(
                     children: [
@@ -191,50 +162,60 @@ class _ReceptionPageState extends State<ReceptionPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'NOW SERVING',
-                              style: TextStyle(
-                                color: WW.teal,
-                                fontSize: 11,
+                              style: GoogleFonts.jetBrainsMono(
+                                color: const Color(0xFFE8400A),
+                                fontSize: 10,
                                 fontWeight: FontWeight.w600,
-                                letterSpacing: 1.4,
+                                letterSpacing: 1.8,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 6),
                             Text(
-                              queue.currentToken != null ? '#${queue.currentToken!.number}' : '—',
-                              style: const TextStyle(
-                                color: WW.textPrimary,
+                              queue.currentToken != null
+                                  ? '#${queue.currentToken!.number}'
+                                  : '—',
+                              style: GoogleFonts.jetBrainsMono(
+                                color: const Color(0xFF1A1A1A),
                                 fontSize: 52,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: -2,
                                 height: 1,
                               ),
                             ),
-                            if (queue.currentToken != null)
+                            if (queue.currentToken != null) ...[
+                              const SizedBox(height: 4),
                               Text(
                                 queue.currentToken!.name,
-                                style: const TextStyle(color: WW.textSecondary, fontSize: 14),
+                                style: GoogleFonts.jetBrainsMono(
+                                  color: const Color(0xFF888888),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
+                            ],
                           ],
                         ),
                       ),
+                      // Next button
                       GestureDetector(
                         onTap: queue.connected
                             ? () => ref.read(queueProvider.notifier).callNext()
                             : null,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          width: 70,
-                          height: 70,
+                        child: Container(
+                          width: 64,
+                          height: 64,
                           decoration: BoxDecoration(
-                            color: queue.connected ? WW.teal : WW.surfaceHigh,
-                            shape: BoxShape.circle,
+                            color: queue.connected
+                                ? const Color(0xFFE8400A)
+                                : const Color(0xFFD6D8DB),
+                            borderRadius: BorderRadius.circular(16),
                             boxShadow: queue.connected
                                 ? [
                                     BoxShadow(
-                                      color: WW.teal.withOpacity(0.4),
-                                      blurRadius: 16,
+                                      color: const Color(0xFFE8400A).withOpacity(0.3),
+                                      blurRadius: 12,
                                       offset: const Offset(0, 4),
                                     ),
                                   ]
@@ -242,70 +223,81 @@ class _ReceptionPageState extends State<ReceptionPage> {
                           ),
                           child: Icon(
                             Icons.skip_next_rounded,
-                            color: queue.connected ? WW.bg : WW.textSecondary,
-                            size: 30,
+                            color: queue.connected ? Colors.white : const Color(0xFF888888),
+                            size: 28,
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+
+                const SizedBox(height: 16),
+
+                // ── Add patient field ──
                 Row(
                   children: [
                     Expanded(
-                      child: TextField(
+                      child: _buildField(
                         controller: _nameController,
-                        style: const TextStyle(color: WW.textPrimary, fontSize: 14),
-                        decoration: WW.inputDeco('Patient name', icon: Icons.person_outline),
+                        hint: 'patient name',
+                        icon: Icons.person_outline_rounded,
                         onSubmitted: (_) => _addPatient(ref),
                       ),
                     ),
                     const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () => _addPatient(ref),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: WW.teal,
-                        foregroundColor: WW.bg,
-                        minimumSize: const Size(54, 54),
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(borderRadius: WW.r12),
-                        elevation: 0,
+                    GestureDetector(
+                      onTap: () => _addPatient(ref),
+                      child: Container(
+                        width: 52,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE8400A),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
                       ),
-                      child: const Icon(Icons.add_rounded, size: 22),
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+
+                const SizedBox(height: 20),
+
+                // ── Queue header ──
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Waiting Queue',
-                      style: TextStyle(
-                        color: WW.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                    Text(
+                      'WAITING QUEUE',
+                      style: GoogleFonts.jetBrainsMono(
+                        color: const Color(0xFF1A1A1A),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.8,
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: WW.teal.withOpacity(0.15),
-                        borderRadius: WW.r12,
+                        color: const Color(0xFFECEDEF),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
                       ),
                       child: Text(
                         '${queue.waitingCount} patients',
-                        style: const TextStyle(
-                          color: WW.teal,
-                          fontSize: 12,
+                        style: GoogleFonts.jetBrainsMono(
+                          color: const Color(0xFF555555),
+                          fontSize: 10,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+
+                const SizedBox(height: 10),
+
+                // ── Queue list ──
                 Expanded(
                   child: queue.waiting.isEmpty
                       ? Center(
@@ -313,31 +305,35 @@ class _ReceptionPageState extends State<ReceptionPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                width: 64,
-                                height: 64,
-                                decoration: const BoxDecoration(
-                                  color: WW.surface,
-                                  shape: BoxShape.circle,
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFECEDEF),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
                                 ),
                                 child: const Icon(
                                   Icons.check_circle_outline_rounded,
-                                  color: WW.teal,
-                                  size: 30,
+                                  color: Color(0xFFE8400A),
+                                  size: 26,
                                 ),
                               ),
-                              const SizedBox(height: 16),
-                              const Text(
+                              const SizedBox(height: 14),
+                              Text(
                                 'Queue is empty',
-                                style: TextStyle(
-                                  color: WW.textPrimary,
-                                  fontSize: 16,
+                                style: GoogleFonts.jetBrainsMono(
+                                  color: const Color(0xFF1A1A1A),
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              const Text(
+                              Text(
                                 'Add a patient above to get started.',
-                                style: TextStyle(color: WW.textSecondary, fontSize: 13),
+                                style: GoogleFonts.jetBrainsMono(
+                                  color: const Color(0xFF888888),
+                                  fontSize: 11,
+                                ),
                               ),
                             ],
                           ),
@@ -349,69 +345,99 @@ class _ReceptionPageState extends State<ReceptionPage> {
                             final t = queue.waiting[i];
                             final isNext = i == 0;
                             return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 12),
                               decoration: BoxDecoration(
-                                color: isNext ? WW.teal.withOpacity(0.08) : WW.surface,
-                                borderRadius: WW.r12,
+                                color: const Color(0xFFF5F6F7),
+                                borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: isNext ? WW.teal.withOpacity(0.3) : WW.surfaceHigh,
+                                  color: isNext
+                                      ? const Color(0xFFE8400A).withOpacity(0.4)
+                                      : const Color(0xFFD6D8DB),
                                   width: 1,
                                 ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.04),
+                                    offset: const Offset(0, 2),
+                                    blurRadius: 6,
+                                  ),
+                                ],
                               ),
                               child: Row(
                                 children: [
+                                  // Token number box
                                   Container(
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
                                       color: isNext
-                                          ? WW.teal.withOpacity(0.2)
-                                          : WW.surfaceHigh.withOpacity(0.5),
-                                      borderRadius: WW.r12,
+                                          ? const Color(0xFFE8400A).withOpacity(0.1)
+                                          : const Color(0xFFECEDEF),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color: isNext
+                                            ? const Color(0xFFE8400A).withOpacity(0.3)
+                                            : const Color(0xFFD6D8DB),
+                                        width: 1,
+                                      ),
                                     ),
                                     child: Center(
                                       child: Text(
                                         '${t.number}',
-                                        style: TextStyle(
-                                          color: isNext ? WW.teal : WW.textSecondary,
-                                          fontSize: 15,
+                                        style: GoogleFonts.jetBrainsMono(
+                                          color: isNext
+                                              ? const Color(0xFFE8400A)
+                                              : const Color(0xFF555555),
+                                          fontSize: 14,
                                           fontWeight: FontWeight.w700,
                                         ),
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 14),
+                                  const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           t.name,
-                                          style: TextStyle(
-                                            color: isNext ? WW.textPrimary : WW.textSecondary,
-                                            fontSize: 14,
-                                            fontWeight: isNext ? FontWeight.w600 : FontWeight.w400,
+                                          style: GoogleFonts.jetBrainsMono(
+                                            color: const Color(0xFF1A1A1A),
+                                            fontSize: 13,
+                                            fontWeight: isNext
+                                                ? FontWeight.w600
+                                                : FontWeight.w400,
                                           ),
                                         ),
                                         if (isNext)
-                                          const Text(
-                                            'Up next',
-                                            style: TextStyle(color: WW.teal, fontSize: 11),
+                                          Text(
+                                            'UP NEXT',
+                                            style: GoogleFonts.jetBrainsMono(
+                                              color: const Color(0xFFE8400A),
+                                              fontSize: 9,
+                                              fontWeight: FontWeight.w600,
+                                              letterSpacing: 1.0,
+                                            ),
                                           ),
                                       ],
                                     ),
                                   ),
+                                  // Wait time
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: WW.surfaceHigh.withOpacity(0.5),
-                                      borderRadius: WW.r12,
+                                      color: const Color(0xFFECEDEF),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                          color: const Color(0xFFD6D8DB), width: 1),
                                     ),
                                     child: Text(
                                       '~${t.estWaitMins} min',
-                                      style: const TextStyle(
-                                        color: WW.textSecondary,
-                                        fontSize: 12,
+                                      style: GoogleFonts.jetBrainsMono(
+                                        color: const Color(0xFF888888),
+                                        fontSize: 10,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -422,11 +448,103 @@ class _ReceptionPageState extends State<ReceptionPage> {
                           },
                         ),
                 ),
+
+                // ── Bottom log strip ──
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFECEDEF),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: queue.connected
+                              ? const Color(0xFFE8400A)
+                              : const Color(0xFFBBBBBB),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        queue.connected
+                            ? 'SYNC_ACTIVE // NODE_01 // REGION_IN'
+                            : 'SYNC_INACTIVE // RECONNECTING...',
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 9,
+                          color: const Color(0xFF888888),
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    ValueChanged<String>? onSubmitted,
+  }) {
+    return Container(
+      height: 44,
+      decoration: BoxDecoration(
+        color: const Color(0xFFECEDEF),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            offset: const Offset(0, 2),
+            blurRadius: 4,
+          ),
+          const BoxShadow(
+            color: Colors.white,
+            offset: Offset(0, -1),
+            blurRadius: 2,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const SizedBox(width: 12),
+          Icon(icon, size: 16, color: const Color(0xFF888888)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              onSubmitted: onSubmitted,
+              style: GoogleFonts.jetBrainsMono(
+                fontSize: 12,
+                color: const Color(0xFF1A1A1A),
+                fontWeight: FontWeight.w500,
+              ),
+              decoration: InputDecoration(
+                hintText: hint,
+                hintStyle: GoogleFonts.jetBrainsMono(
+                  fontSize: 12,
+                  color: const Color(0xFFAAAAAA),
+                ),
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

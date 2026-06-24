@@ -9,7 +9,7 @@ const authRouter = require("./router/auth")
 require("dotenv").config()
 
 app.use(cors({
-  origin: 'http://localhost:63515', // your Flutter web port, usually 5000 or 8080
+  origin: 'http://localhost:50978', // your Flutter web port, usually 5000 or 8080
   credentials: true,               // needed since you're using cookies
 }))
 
