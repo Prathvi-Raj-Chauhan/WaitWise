@@ -26,7 +26,7 @@ class AuthUser {
 class AuthService {
   static Dio get _dio => Dioclient.dio;
 
-  static Future<AuthUser> register({
+  static Future<bool> register({
     required String email,
     required String password,
     required String name,
@@ -38,19 +38,33 @@ class AuthService {
         'password': password,
         'name': name,
       });
-      return AuthUser.fromJson(res.data['clinic'] ?? {});
+      final data =  res.data;
+      if(data['success'] == 'true'){
+        // TODO: use shared prefs and store clinic info like name etc.
+        return true;
+      }
+      else {
+        return false;
+      }
     } on DioException catch (e) {
       throw AuthException(_extractError(e, 'Registration failed'));
     }
   }
 
-  static Future<AuthUser> login({required String email, required String password}) async {
+  static Future<bool> login({required String email, required String password}) async {
     try {
       final res = await _dio.post('/auth/login', data: {
         'email': email,
         'password': password,
       });
-      return AuthUser.fromJson(res.data['clinic'] ?? {});
+      final data =  res.data;
+      if(data['success'] == 'true'){
+        // TODO: use shared prefs and store clinic info like name etc.
+        return true;
+      }
+      else {
+        return false;
+      }
     } on DioException catch (e) {
       throw AuthException(_extractError(e, 'Login failed'));
     }

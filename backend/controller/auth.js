@@ -74,11 +74,18 @@ async function clinicRegister(req, res) {
         secure: false
     })
     return res.status(201).json({
+        "success" : "true",
         "message" : "Successfully Registered",
         "user" : sanitisedUser,
         ...tokens
     })
   } catch (e) {
+    console.log("************CAUSE***********")
+    console.log(e.cause)
+    console.log("************STACK***********")
+    console.log(e.stack)
+    console.log("************MESSAGE***********")
+    console.log(e.message)
     return res.status(500).json({
         "Error" : "Server Error",
         "e" : e.message
@@ -135,6 +142,7 @@ async function clinicLogin(req, res) {
         secure: false
     })
     return res.status(200).json({
+        "success" : "true",
         "message" : "Successfully Logged in",
         "clinic" : sanitisedClinic,
         ...tokens
@@ -203,3 +211,9 @@ async function createAppointmentAndAddPatient(req, res){
     }
 }
 
+module.exports = {
+    createAppointmentAndAddPatient,
+    clinicLogin,
+    clinicRegister,
+    registerPatientByClinic
+}

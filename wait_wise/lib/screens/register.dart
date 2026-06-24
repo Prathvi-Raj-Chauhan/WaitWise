@@ -1,7 +1,11 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wait_wise/provider/provider.dart';
 import 'package:wait_wise/screens/login.dart';
-import 'package:wait_wise/screens/register.dart';
+import 'package:wait_wise/screens/reception_screen.dart';
+import 'package:wait_wise/screens/tv_screen.dart';
 import 'package:wait_wise/services/authService.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -29,9 +33,47 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  void _handleRegister() {
+  String _generateClinicId() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
+    final rand = Random();
+    return List.generate(6, (_) => chars[rand.nextInt(chars.length)]).join();
+  }
+
+  void _handleRegister(WidgetRef ref) async {
     setState(() => _isLoading = true);
-    AuthService.register(email: _nameController.text.trim(), password: _passController.text.trim(), name: _nameController.text.trim());
+    if (_cnfpassController.text.trim() != _passController.text.trim()) {
+      return;
+    }
+    final res = await AuthService.register(
+      email: _nameController.text.trim(),
+      password: _passController.text.trim(),
+      name: _nameController.text.trim(),
+    );
+    if (res == true) {
+      String clinicId = _generateClinicId();
+      _connect(ref, clinicId: clinicId, isReceptionist: true);
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void _connect(
+    WidgetRef ref, {
+    required String clinicId,
+    required bool isReceptionist,
+  }) {
+    final url = "http://localhost:9000";
+    if (url.isEmpty) return;
+    ref.read(serverUrlProvider.notifier).state = url;
+    ref.read(clinicIdProvider.notifier).state = clinicId;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            isReceptionist ? ReceptionPage(clinicId: clinicId) : const tv(),
+      ),
+    );
   }
 
   @override
@@ -108,11 +150,20 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   const SizedBox(height: 40),
 
-                  _featureRow(Icons.bolt_outlined, 'Live queue sync across all nodes'),
+                  _featureRow(
+                    Icons.bolt_outlined,
+                    'Live queue sync across all nodes',
+                  ),
                   const SizedBox(height: 14),
-                  _featureRow(Icons.bar_chart_outlined, 'Real-time analytics & reporting'),
+                  _featureRow(
+                    Icons.bar_chart_outlined,
+                    'Real-time analytics & reporting',
+                  ),
                   const SizedBox(height: 14),
-                  _featureRow(Icons.lock_outline_rounded, 'Role-based access control'),
+                  _featureRow(
+                    Icons.lock_outline_rounded,
+                    'Role-based access control',
+                  ),
 
                   const Spacer(),
 
@@ -189,264 +240,285 @@ class _RegisterPageState extends State<RegisterPage> {
                   ],
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    // Header
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFE8400A),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'WAIT_WISE // AUTH',
-                            style: GoogleFonts.jetBrainsMono(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1.2,
+                child: Consumer(
+                  builder: (context, ref, _) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Header
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 14,
+                          ),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFE8400A),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(24),
+                              topRight: Radius.circular(24),
                             ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              'PRT 01',
-                              style: GoogleFonts.jetBrainsMono(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Body
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-
-                            Text(
-                              'Register',
-                              style: GoogleFonts.jetBrainsMono(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 26,
-                                color: const Color(0xFF1A1A1A),
-                                letterSpacing: 2,
-                              ),
-                            ),
-
-                            const SizedBox(height: 20),
-
-                            Text(
-                              'NAME',
-                              style: GoogleFonts.jetBrainsMono(
-                                fontSize: 10,
-                                color: const Color(0xFF888888),
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 1.0,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            _buildField(
-                              controller: _nameController,
-                              hint: 'enter_identity',
-                              icon: Icons.person_outline_rounded,
-                              obscure: false,
-                            ),
-
-                            const SizedBox(height: 14),
-                            Text(
-                              'EMAIL_ID',
-                              style: GoogleFonts.jetBrainsMono(
-                                fontSize: 10,
-                                color: const Color(0xFF888888),
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 1.0,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            _buildField(
-                              controller: _emailController,
-                              hint: 'enter email',
-                              icon: Icons.person_outline_rounded,
-                              obscure: false,
-                            ),
-
-                            const SizedBox(height: 14),
-
-                            Text(
-                              'PASS_KEY',
-                              style: GoogleFonts.jetBrainsMono(
-                                fontSize: 10,
-                                color: const Color(0xFF888888),
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 1.0,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            _buildField(
-                              controller: _passController,
-                              hint: '••••••••',
-                              icon: Icons.lock_outline_rounded,
-                              obscure: _obscurePassword,
-                              suffix: GestureDetector(
-                                onTap: () => setState(
-                                    () => _obscurePassword = !_obscurePassword),
-                                child: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                  size: 16,
-                                  color: const Color(0xFF888888),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'WAIT_WISE // AUTH',
+                                style: GoogleFonts.jetBrainsMono(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1.2,
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 14),
-                            Text(
-                              'CONFIRM PASS_KEY',
-                              style: GoogleFonts.jetBrainsMono(
-                                fontSize: 10,
-                                color: const Color(0xFF888888),
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 1.0,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            _buildField(
-                              controller: _cnfpassController,
-                              hint: '••••••••',
-                              icon: Icons.lock_outline_rounded,
-                              obscure: _obscurePassword,
-                              suffix: GestureDetector(
-                                onTap: () => setState(
-                                    () => _obscurePassword = !_obscurePassword),
-                                child: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                  size: 16,
-                                  color: const Color(0xFF888888),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
                                 ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 20),
-
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFECEDEF),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: const Color(0xFFD6D8DB),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _logLine('00:00:01', 'PROTOCOL AUTH READY.',
-                                      orange: true),
-                                  const SizedBox(height: 2),
-                                  _logLine('00:00:02', 'AWAITING CREDENTIALS.',
-                                      orange: false),
-                                ],
-                              ),
-                            ),
-
-                            const SizedBox(height: 14),
-
-                            // Execute button
-                            GestureDetector(
-                              onTap: _isLoading ? null : _handleRegister,
-                              child: Container(
-                                width: double.infinity,
-                                height: 46,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFE8400A),
-                                  borderRadius: BorderRadius.circular(12),
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                                child: Center(
-                                  child: _isLoading
-                                      ? const SizedBox(
-                                          height: 18,
-                                          width: 18,
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                            strokeWidth: 2,
-                                          ),
-                                        )
-                                      : Text(
-                                          'EXECUTE',
-                                          style: GoogleFonts.jetBrainsMono(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 13,
-                                            letterSpacing: 2.5,
-                                          ),
-                                        ),
+                                child: Text(
+                                  'PRT 01',
+                                  style: GoogleFonts.jetBrainsMono(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'HAVE AN ACCOUNT? ',
-                                    style: GoogleFonts.jetBrainsMono(
-                                      fontSize: 9,
-                                      color: const Color(0xFF888888),
-                                      letterSpacing: 0.8,
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) => LoginPage(),
-                                        ),
-                                      );
-                                    },
-                                    child: Text(
-                                      'LOGIN NOW',
-                                      style: GoogleFonts.jetBrainsMono(
-                                        fontSize: 9,
-                                        color: const Color(0xFFE8400A),
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 0.8,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
+
+                        // Body
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Register',
+                                  style: GoogleFonts.jetBrainsMono(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 26,
+                                    color: const Color(0xFF1A1A1A),
+                                    letterSpacing: 2,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 20),
+
+                                Text(
+                                  'NAME',
+                                  style: GoogleFonts.jetBrainsMono(
+                                    fontSize: 10,
+                                    color: const Color(0xFF888888),
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                _buildField(
+                                  controller: _nameController,
+                                  hint: 'enter_identity',
+                                  icon: Icons.person_outline_rounded,
+                                  obscure: false,
+                                ),
+
+                                const SizedBox(height: 14),
+                                Text(
+                                  'EMAIL_ID',
+                                  style: GoogleFonts.jetBrainsMono(
+                                    fontSize: 10,
+                                    color: const Color(0xFF888888),
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                _buildField(
+                                  controller: _emailController,
+                                  hint: 'enter email',
+                                  icon: Icons.person_outline_rounded,
+                                  obscure: false,
+                                ),
+
+                                const SizedBox(height: 14),
+
+                                Text(
+                                  'PASS_KEY',
+                                  style: GoogleFonts.jetBrainsMono(
+                                    fontSize: 10,
+                                    color: const Color(0xFF888888),
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                _buildField(
+                                  controller: _passController,
+                                  hint: '••••••••',
+                                  icon: Icons.lock_outline_rounded,
+                                  obscure: _obscurePassword,
+                                  suffix: GestureDetector(
+                                    onTap: () => setState(
+                                      () =>
+                                          _obscurePassword = !_obscurePassword,
+                                    ),
+                                    child: Icon(
+                                      _obscurePassword
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
+                                      size: 16,
+                                      color: const Color(0xFF888888),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 14),
+                                Text(
+                                  'CONFIRM PASS_KEY',
+                                  style: GoogleFonts.jetBrainsMono(
+                                    fontSize: 10,
+                                    color: const Color(0xFF888888),
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                _buildField(
+                                  controller: _cnfpassController,
+                                  hint: '••••••••',
+                                  icon: Icons.lock_outline_rounded,
+                                  obscure: _obscurePassword,
+                                  suffix: GestureDetector(
+                                    onTap: () => setState(
+                                      () =>
+                                          _obscurePassword = !_obscurePassword,
+                                    ),
+                                    child: Icon(
+                                      _obscurePassword
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
+                                      size: 16,
+                                      color: const Color(0xFF888888),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 20),
+
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFECEDEF),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: const Color(0xFFD6D8DB),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _logLine(
+                                        '00:00:01',
+                                        'PROTOCOL AUTH READY.',
+                                        orange: true,
+                                      ),
+                                      const SizedBox(height: 2),
+                                      _logLine(
+                                        '00:00:02',
+                                        'AWAITING CREDENTIALS.',
+                                        orange: false,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                const SizedBox(height: 14),
+
+                                // Execute button
+                                GestureDetector(
+                                  onTap: _isLoading ? null : (){
+                                    _handleRegister(ref);
+                                  },
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 46,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFE8400A),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Center(
+                                      child: _isLoading
+                                          ? const SizedBox(
+                                              height: 18,
+                                              width: 18,
+                                              child: CircularProgressIndicator(
+                                                color: Colors.white,
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : Text(
+                                              'EXECUTE',
+                                              style: GoogleFonts.jetBrainsMono(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 13,
+                                                letterSpacing: 2.5,
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 12),
+
+                                Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'HAVE AN ACCOUNT? ',
+                                        style: GoogleFonts.jetBrainsMono(
+                                          fontSize: 9,
+                                          color: const Color(0xFF888888),
+                                          letterSpacing: 0.8,
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) => LoginPage(),
+                                            ),
+                                          );
+                                        },
+                                        child: Text(
+                                          'LOGIN NOW',
+                                          style: GoogleFonts.jetBrainsMono(
+                                            fontSize: 9,
+                                            color: const Color(0xFFE8400A),
+                                            fontWeight: FontWeight.w600,
+                                            letterSpacing: 0.8,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),
@@ -553,10 +625,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           ),
-          if (suffix != null) ...[
-            suffix,
-            const SizedBox(width: 12),
-          ],
+          if (suffix != null) ...[suffix, const SizedBox(width: 12)],
         ],
       ),
     );

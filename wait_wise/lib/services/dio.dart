@@ -5,7 +5,7 @@ import 'package:flutter/rendering.dart';
 class Dioclient{
   static late final Dio dio;
 
-  void init(){
+  static void init(){
     BaseOptions options = BaseOptions(
       baseUrl: "http://localhost:9000",
       headers: {

@@ -5,9 +5,15 @@ const app = express()
 const {Server} = require("socket.io")
 const PORT = 9000
 const server = http.createServer(app)
+const authRouter = require("./router/auth")
 require("dotenv").config()
-app.use(cors())
 
+app.use(cors({
+  origin: 'http://localhost:63515', // your Flutter web port, usually 5000 or 8080
+  credentials: true,               // needed since you're using cookies
+}))
+
+app.use(express.json())
 
 const clinics = new Map()
 const socket = new Server(server, {
@@ -103,5 +109,7 @@ socket.on("connection" , (sock) => {
     sock.on("disconnect", () => console.log(`Disconnected: ${sock.id}`))
 })
 
+
+app.use("/auth", authRouter)
 
 server.listen(PORT, '0.0.0.0',  ()=> {console.log(`Server Started at Port = ${PORT}`)})
