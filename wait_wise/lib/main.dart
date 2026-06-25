@@ -4,7 +4,7 @@ import 'package:wait_wise/screens/home_screen.dart';
 import 'package:wait_wise/screens/tv_screen.dart';
 import 'package:wait_wise/screens/login.dart';
 import 'package:wait_wise/screens/wait_room.dart';
-import 'package:wait_wise/services/dio.dart';
+import 'package:wait_wise/services/dioClient.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

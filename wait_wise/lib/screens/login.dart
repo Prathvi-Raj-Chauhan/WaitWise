@@ -1,10 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wait_wise/provider/provider.dart';
-import 'package:wait_wise/screens/reception_screen.dart';
 import 'package:wait_wise/screens/register.dart';
 import 'package:wait_wise/screens/role_select_page.dart';
 import 'package:wait_wise/screens/wait_room.dart';
@@ -30,12 +27,6 @@ class _LoginPageState extends State<LoginPage> {
     _userController.dispose();
     _passController.dispose();
     super.dispose();
-  }
-
-  String _generateClinicId() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
-    final rand = Random();
-    return List.generate(6, (_) => chars[rand.nextInt(chars.length)]).join();
   }
 
   void _handleLogin(WidgetRef ref) async {

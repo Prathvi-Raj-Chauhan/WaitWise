@@ -32,7 +32,8 @@ const patient = pgTable("patient", {
     passwordHash: text("password_hash"), // null for google oAuth
     googleId : text("google_id").unique(),
     createdAt : timestamp("created_at").defaultNow(),
-    updatedAt : timestamp("updated_at").defaultNow()
+    updatedAt : timestamp("updated_at").defaultNow(),
+    address : text('address')
 })
 
 const appointment = pgTable("appointment", {
@@ -40,7 +41,12 @@ const appointment = pgTable("appointment", {
     patient_id : uuid("patient_id").notNull().references(() => patient.id, {onDelete : "cascade"}),
     clinic_id : uuid("clinic_id").notNull().references(() => clinic.id, {onDelete : "cascade"}),
     time : timestamp("time").defaultNow(),
-    status : statusEnum("status").default("pending").notNull()
+    status : statusEnum("status").default("pending").notNull(),
+    weight : text("weight"),
+    blood_pressure : text("blood_pressure"),
+    added_at : text("added_at"), // this is to fetch the appointment by using clinic id and addedAt
+    reason : text("reason"),
+
 })
 
 const refreshTokens = pgTable("refresh_tokens", {

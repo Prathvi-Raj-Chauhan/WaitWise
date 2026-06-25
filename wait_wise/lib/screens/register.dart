@@ -45,7 +45,7 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
     final res = await AuthService.register(
-      email: _nameController.text.trim(),
+      email: _emailController.text.trim(),
       password: _passController.text.trim(),
       name: _nameController.text.trim(),
     );

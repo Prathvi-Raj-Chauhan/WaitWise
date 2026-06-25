@@ -1,12 +1,10 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wait_wise/provider/provider.dart';
 import 'package:wait_wise/screens/doctor_screen.dart';
 import 'package:wait_wise/screens/reception_screen.dart';
-import 'package:wait_wise/screens/wait_room.dart';
 import 'package:wait_wise/widgets/clinicIdDialog.dart';
 
 class RoleSelectPage extends StatefulWidget {
@@ -19,7 +17,6 @@ class RoleSelectPage extends StatefulWidget {
 
 class _RoleSelectPageState extends State<RoleSelectPage> {
   String? _selected; // 'doctor' | 'reception' | null
-  bool _isLoading = false;
   void _connect(
     WidgetRef ref, {
     required String clinicId,

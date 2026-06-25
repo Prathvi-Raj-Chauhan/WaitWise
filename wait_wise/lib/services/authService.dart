@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:wait_wise/services/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wait_wise/services/dioClient.dart';
 
 
 class AuthException implements Exception {
@@ -39,14 +40,17 @@ class AuthService {
         'name': name,
       });
       final data =  res.data;
+      final SharedPreferences pref = await SharedPreferences.getInstance();
       if(data['success'] == 'true'){
-        // TODO: use shared prefs and store clinic info like name etc.
+        await pref.setString('clinicDbId', data['clinic']['id']);
+        
         return true;
       }
       else {
         return false;
       }
     } on DioException catch (e) {
+      print(e);
       throw AuthException(_extractError(e, 'Registration failed'));
     }
   }
@@ -58,8 +62,9 @@ class AuthService {
         'password': password,
       });
       final data =  res.data;
+      final SharedPreferences pref = await SharedPreferences.getInstance();
       if(data['success'] == 'true'){
-        // TODO: use shared prefs and store clinic info like name etc.
+        await pref.setString('clinicDbId', data['clinic']['id']);
         return true;
       }
       else {
