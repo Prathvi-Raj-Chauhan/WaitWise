@@ -9,8 +9,8 @@ const authRouter = require("./router/auth")
 require("dotenv").config()
 
 app.use(cors({
-  origin: 'http://localhost:50978', // your Flutter web port, usually 5000 or 8080
-  credentials: true,               // needed since you're using cookies
+  origin: ['http://localhost:50978', 'http://localhost:50979'],
+  credentials: true,               
 }))
 
 app.use(express.json())
@@ -65,24 +65,34 @@ socket.on("connection" , (sock) => {
     sock.join(clinicId)
     broadcast(clinicId)
     sock.on("addPatient" , (data, ack) => {
-        const name = data?.name?.trim()
+         const name = data?.name?.trim()
+        const reason = data?.reason?.trim()
+        if (!name) return ack?.({ ok: false, error: "Name not provided" })
+        if (!reason) return ack?.({ ok: false, error: "Reason not provided" })
 
-        if(!name){
-            return ack?.({ok : false, error : "Name not Provided"})
-        }
-
+        const age    = data?.age    ? parseInt(data.age.toString().trim(), 10)    : null
+        const weight = data?.weight ? parseInt(data.weight.toString().trim(), 10) : null
+        const bloodPressure = data?.bloodPressure?.trim() || null
+        const address       = data?.address?.trim()       || null
+        const gender        = data?.gender?.trim()        || null
+ 
         const clinic = getClinic(clinicId)
         const patient = {
-            name : name,
-            token : clinic.nextToken++,
-            addedAt : Date.now()
+            id: `${clinicId}-${clinic.nextToken}`,  
+            token: clinic.nextToken++,
+            name,
+            age,
+            gender,
+            bloodPressure,
+            weight,
+            reason,
+            address,
+            addedAt: Date.now(),
         }
         clinic.queue.push(patient)
         console.log("Patient Added : ", patient)
-        console.log("Queue State = >" , clinic.queue)
-        console.log("Queue State = >" , clinic.consultDurations)
         broadcast(clinicId)
-        ack?.({ ok: true})
+        ack?.({ ok: true })
     })
     sock.on("callNext", (_, ack) => {
         const clinic = getClinic(clinicId)
