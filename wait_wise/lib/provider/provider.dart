@@ -37,7 +37,7 @@ final queueProvider = StateNotifierProvider<QueueNotifier, QueueState>((ref){
 
 class QueueNotifier extends StateNotifier<QueueState>{
   final IO.Socket? socket;
-  QueueNotifier(this.socket) : super(QueueState.empty()){ //runs before constructor body, 'll initialze QueueState
+  QueueNotifier(this.socket) : super(QueueState.empty()){ //runs before constructor body, 'll initialze QueueState as empty
     print("QueueNotifier created");
     socket?.on("queueUpdated", (data){
       state = QueueState.fromJson(data);
@@ -61,14 +61,33 @@ class QueueNotifier extends StateNotifier<QueueState>{
       }
     });
   }
-  void addPatient(String name){
-    if(socket == null){
-      return;
-    }
-    socket!.emitWithAck('addPatient', {'name': name}, ack: (res){
-      if(res['ok'] != true){
-        //TODO: show error;
-      }
-    });
+   void addPatient({
+    required String name,
+    required String reason,
+    String? age,
+    String? gender,
+    String? weight,
+    String? bloodPressure,
+    String? address,
+  }) {
+    if (socket == null) return;
+    socket!.emitWithAck(
+      'addPatient',
+      {
+        'name':          name,
+        'reason':        reason,
+        'age':           age,
+        'gender':        gender,
+        'weight':        weight,
+        'bloodPressure': bloodPressure,
+        'address':       address,
+      },
+      ack: (res) {
+        if (res['ok'] != true) {
+          // TODO: surface error to UI
+          print("addPatient error: ${res['error']}");
+        }
+      },
+    );
   }
 }

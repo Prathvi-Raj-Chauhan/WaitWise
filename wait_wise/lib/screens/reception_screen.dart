@@ -13,21 +13,6 @@ class ReceptionPage extends StatefulWidget {
 }
 
 class _ReceptionPageState extends State<ReceptionPage> {
-  final _nameController = TextEditingController();
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-
-  void _addPatient(WidgetRef ref) {
-    final name = _nameController.text.trim();
-    if (name.isEmpty) return;
-    ref.read(queueProvider.notifier).addPatient(name);
-    _nameController.clear();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer(
@@ -42,12 +27,14 @@ class _ReceptionPageState extends State<ReceptionPage> {
             surfaceTintColor: Colors.transparent,
             shadowColor: Colors.black.withOpacity(0.08),
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF888888), size: 20),
+              icon: const Icon(Icons.arrow_back_rounded,
+                  color: Color(0xFF888888), size: 20),
               onPressed: () => Navigator.pop(context),
             ),
             title: Row(
               children: [
-                const Icon(Icons.local_hospital_outlined, color: Color(0xFFE8400A), size: 16),
+                const Icon(Icons.local_hospital_outlined,
+                    color: Color(0xFFE8400A), size: 16),
                 const SizedBox(width: 8),
                 Text(
                   'RECEPTIONIST',
@@ -61,7 +48,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
               ],
             ),
             actions: [
-              // Clinic ID chip
               GestureDetector(
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: widget.clinicId));
@@ -82,11 +68,13 @@ class _ReceptionPageState extends State<ReceptionPage> {
                 },
                 child: Container(
                   margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: const Color(0xFFECEDEF),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
+                    border:
+                        Border.all(color: const Color(0xFFD6D8DB), width: 1),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -101,12 +89,12 @@ class _ReceptionPageState extends State<ReceptionPage> {
                         ),
                       ),
                       const SizedBox(width: 5),
-                      const Icon(Icons.copy_rounded, color: Color(0xFF888888), size: 12),
+                      const Icon(Icons.copy_rounded,
+                          color: Color(0xFF888888), size: 12),
                     ],
                   ),
                 ),
               ),
-              // Live status
               Padding(
                 padding: const EdgeInsets.only(right: 16),
                 child: Row(
@@ -116,7 +104,9 @@ class _ReceptionPageState extends State<ReceptionPage> {
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: queue.connected ? const Color(0xFFE8400A) : const Color(0xFFBBBBBB),
+                        color: queue.connected
+                            ? const Color(0xFFE8400A)
+                            : const Color(0xFFBBBBBB),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -124,7 +114,9 @@ class _ReceptionPageState extends State<ReceptionPage> {
                     Text(
                       queue.connected ? 'LIVE' : 'OFFLINE',
                       style: GoogleFonts.jetBrainsMono(
-                        color: queue.connected ? const Color(0xFFE8400A) : const Color(0xFFBBBBBB),
+                        color: queue.connected
+                            ? const Color(0xFFE8400A)
+                            : const Color(0xFFBBBBBB),
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 1.0,
@@ -136,126 +128,133 @@ class _ReceptionPageState extends State<ReceptionPage> {
             ],
           ),
           body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
-                // ── Now Serving card ──
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5F6F7),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
-                        offset: const Offset(0, 4),
-                        blurRadius: 16,
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                // ── Now Serving + Stats row ──
+                Row(
+                  children: [
+                    // Now serving card
+                    Expanded(
+                      flex: 3,
+                      child: Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F6F7),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                              color: const Color(0xFFD6D8DB), width: 1),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.07),
+                              offset: const Offset(0, 4),
+                              blurRadius: 14,
+                            ),
+                          ],
+                        ),
+                        child: Row(
                           children: [
-                            Text(
-                              'NOW SERVING',
-                              style: GoogleFonts.jetBrainsMono(
-                                color: const Color(0xFFE8400A),
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 1.8,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'NOW SERVING',
+                                    style: GoogleFonts.jetBrainsMono(
+                                      color: const Color(0xFFE8400A),
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 1.8,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    queue.currentToken != null
+                                        ? '#${queue.currentToken!.number}'
+                                        : '—',
+                                    style: GoogleFonts.jetBrainsMono(
+                                      color: const Color(0xFF1A1A1A),
+                                      fontSize: 44,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: -2,
+                                      height: 1,
+                                    ),
+                                  ),
+                                  if (queue.currentToken != null) ...[
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      queue.currentToken!.name,
+                                      style: GoogleFonts.jetBrainsMono(
+                                        color: const Color(0xFF888888),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
                             ),
-                            const SizedBox(height: 6),
-                            Text(
-                              queue.currentToken != null
-                                  ? '#${queue.currentToken!.number}'
-                                  : '—',
-                              style: GoogleFonts.jetBrainsMono(
-                                color: const Color(0xFF1A1A1A),
-                                fontSize: 52,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -2,
-                                height: 1,
-                              ),
-                            ),
-                            if (queue.currentToken != null) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                queue.currentToken!.name,
-                                style: GoogleFonts.jetBrainsMono(
-                                  color: const Color(0xFF888888),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
+                            GestureDetector(
+                              onTap: queue.connected
+                                  ? () => ref
+                                      .read(queueProvider.notifier)
+                                      .callNext()
+                                  : null,
+                              child: Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  color: queue.connected
+                                      ? const Color(0xFFE8400A)
+                                      : const Color(0xFFD6D8DB),
+                                  borderRadius: BorderRadius.circular(14),
+                                  boxShadow: queue.connected
+                                      ? [
+                                          BoxShadow(
+                                            color: const Color(0xFFE8400A)
+                                                .withOpacity(0.3),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ]
+                                      : [],
+                                ),
+                                child: Icon(
+                                  Icons.skip_next_rounded,
+                                  color: queue.connected
+                                      ? Colors.white
+                                      : const Color(0xFF888888),
+                                  size: 26,
                                 ),
                               ),
-                            ],
+                            ),
                           ],
                         ),
                       ),
-                      // Next button
-                      GestureDetector(
-                        onTap: queue.connected
-                            ? () => ref.read(queueProvider.notifier).callNext()
-                            : null,
-                        child: Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(
-                            color: queue.connected
-                                ? const Color(0xFFE8400A)
-                                : const Color(0xFFD6D8DB),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: queue.connected
-                                ? [
-                                    BoxShadow(
-                                      color: const Color(0xFFE8400A).withOpacity(0.3),
-                                      blurRadius: 12,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ]
-                                : [],
-                          ),
-                          child: Icon(
-                            Icons.skip_next_rounded,
-                            color: queue.connected ? Colors.white : const Color(0xFF888888),
-                            size: 28,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // ── Add patient field ──
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildField(
-                        controller: _nameController,
-                        hint: 'patient name',
-                        icon: Icons.person_outline_rounded,
-                        onSubmitted: (_) => _addPatient(ref),
-                      ),
                     ),
-                    const SizedBox(width: 10),
-                    GestureDetector(
-                      onTap: () => _addPatient(ref),
-                      child: Container(
-                        width: 52,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE8400A),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
+
+                    const SizedBox(width: 12),
+
+                    // Stats column
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        children: [
+                          _statCard(
+                            label: 'WAITING',
+                            value: '${queue.waitingCount}',
+                            icon: Icons.people_outline_rounded,
+                          ),
+                          const SizedBox(height: 10),
+                          _statCard(
+                            label: 'TOTAL TODAY',
+                            value: '${queue.waitingCount + (queue.currentToken != null ? 1 : 0)}',
+                            icon: Icons.bar_chart_rounded,
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -263,7 +262,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
 
                 const SizedBox(height: 20),
 
-                // ── Queue header ──
+                // ── Queue header + Add button ──
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -276,19 +275,31 @@ class _ReceptionPageState extends State<ReceptionPage> {
                         letterSpacing: 1.8,
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFECEDEF),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
-                      ),
-                      child: Text(
-                        '${queue.waitingCount} patients',
-                        style: GoogleFonts.jetBrainsMono(
-                          color: const Color(0xFF555555),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
+                    GestureDetector(
+                      onTap: () => _showAddPatientDialog(context, ref),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 7),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE8400A),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.add_rounded,
+                                color: Colors.white, size: 14),
+                            const SizedBox(width: 5),
+                            Text(
+                              'NEW PATIENT',
+                              style: GoogleFonts.jetBrainsMono(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -305,34 +316,35 @@ class _ReceptionPageState extends State<ReceptionPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                width: 56,
-                                height: 56,
+                                width: 52,
+                                height: 52,
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFECEDEF),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                      color: const Color(0xFFD6D8DB), width: 1),
                                 ),
                                 child: const Icon(
                                   Icons.check_circle_outline_rounded,
                                   color: Color(0xFFE8400A),
-                                  size: 26,
+                                  size: 24,
                                 ),
                               ),
-                              const SizedBox(height: 14),
+                              const SizedBox(height: 12),
                               Text(
                                 'Queue is empty',
                                 style: GoogleFonts.jetBrainsMono(
                                   color: const Color(0xFF1A1A1A),
-                                  fontSize: 14,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 3),
                               Text(
-                                'Add a patient above to get started.',
+                                'Tap NEW PATIENT to register.',
                                 style: GoogleFonts.jetBrainsMono(
                                   color: const Color(0xFF888888),
-                                  fontSize: 11,
+                                  fontSize: 10,
                                 ),
                               ),
                             ],
@@ -340,7 +352,8 @@ class _ReceptionPageState extends State<ReceptionPage> {
                         )
                       : ListView.separated(
                           itemCount: queue.waiting.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 8),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 8),
                           itemBuilder: (_, i) {
                             final t = queue.waiting[i];
                             final isNext = i == 0;
@@ -352,7 +365,8 @@ class _ReceptionPageState extends State<ReceptionPage> {
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: isNext
-                                      ? const Color(0xFFE8400A).withOpacity(0.4)
+                                      ? const Color(0xFFE8400A)
+                                          .withOpacity(0.4)
                                       : const Color(0xFFD6D8DB),
                                   width: 1,
                                 ),
@@ -366,18 +380,19 @@ class _ReceptionPageState extends State<ReceptionPage> {
                               ),
                               child: Row(
                                 children: [
-                                  // Token number box
                                   Container(
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
                                       color: isNext
-                                          ? const Color(0xFFE8400A).withOpacity(0.1)
+                                          ? const Color(0xFFE8400A)
+                                              .withOpacity(0.1)
                                           : const Color(0xFFECEDEF),
                                       borderRadius: BorderRadius.circular(10),
                                       border: Border.all(
                                         color: isNext
-                                            ? const Color(0xFFE8400A).withOpacity(0.3)
+                                            ? const Color(0xFFE8400A)
+                                                .withOpacity(0.3)
                                             : const Color(0xFFD6D8DB),
                                         width: 1,
                                       ),
@@ -398,7 +413,8 @@ class _ReceptionPageState extends State<ReceptionPage> {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           t.name,
@@ -423,7 +439,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
                                       ],
                                     ),
                                   ),
-                                  // Wait time
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 8, vertical: 4),
@@ -431,7 +446,8 @@ class _ReceptionPageState extends State<ReceptionPage> {
                                       color: const Color(0xFFECEDEF),
                                       borderRadius: BorderRadius.circular(20),
                                       border: Border.all(
-                                          color: const Color(0xFFD6D8DB), width: 1),
+                                          color: const Color(0xFFD6D8DB),
+                                          width: 1),
                                     ),
                                     child: Text(
                                       '~${t.estWaitMins} min',
@@ -452,11 +468,13 @@ class _ReceptionPageState extends State<ReceptionPage> {
                 // ── Bottom log strip ──
                 const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: const Color(0xFFECEDEF),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
+                    border:
+                        Border.all(color: const Color(0xFFD6D8DB), width: 1),
                   ),
                   child: Row(
                     children: [
@@ -492,59 +510,460 @@ class _ReceptionPageState extends State<ReceptionPage> {
     );
   }
 
-  Widget _buildField({
-    required TextEditingController controller,
-    required String hint,
+  Widget _statCard({
+    required String label,
+    required String value,
     required IconData icon,
-    ValueChanged<String>? onSubmitted,
   }) {
     return Container(
-      height: 44,
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFECEDEF),
-        borderRadius: BorderRadius.circular(10),
+        color: const Color(0xFFF5F6F7),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            offset: const Offset(0, 2),
-            blurRadius: 4,
-          ),
-          const BoxShadow(
-            color: Colors.white,
-            offset: Offset(0, -1),
-            blurRadius: 2,
+            color: Colors.black.withOpacity(0.05),
+            offset: const Offset(0, 3),
+            blurRadius: 10,
           ),
         ],
       ),
       child: Row(
         children: [
-          const SizedBox(width: 12),
           Icon(icon, size: 16, color: const Color(0xFF888888)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: TextField(
-              controller: controller,
-              onSubmitted: onSubmitted,
-              style: GoogleFonts.jetBrainsMono(
-                fontSize: 12,
-                color: const Color(0xFF1A1A1A),
-                fontWeight: FontWeight.w500,
-              ),
-              decoration: InputDecoration(
-                hintText: hint,
-                hintStyle: GoogleFonts.jetBrainsMono(
-                  fontSize: 12,
-                  color: const Color(0xFFAAAAAA),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: GoogleFonts.jetBrainsMono(
+                  color: const Color(0xFF1A1A1A),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
                 ),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
               ),
-            ),
+              Text(
+                label,
+                style: GoogleFonts.jetBrainsMono(
+                  color: const Color(0xFF888888),
+                  fontSize: 8,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
           ),
         ],
       ),
+    );
+  }
+
+  void _showAddPatientDialog(BuildContext context, WidgetRef ref) {
+    final nameController = TextEditingController();
+    final ageController = TextEditingController();
+    final bpController = TextEditingController();
+    final weightController = TextEditingController();
+    final reasonController = TextEditingController();
+    final addressController = TextEditingController();
+    String selectedGender = '';
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.3),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: Container(
+                width: 360,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F6F7),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.13),
+                      offset: const Offset(4, 12),
+                      blurRadius: 24,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    // Header
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 14),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFE8400A),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'WAIT_WISE // NEW PATIENT',
+                            style: GoogleFonts.jetBrainsMono(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: const Icon(Icons.close_rounded,
+                                color: Colors.white, size: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Form body
+                    Flexible(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+
+                            Text(
+                              'REGISTER',
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF1A1A1A),
+                                letterSpacing: 2,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Fields marked * are required.',
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 9,
+                                color: const Color(0xFF888888),
+                              ),
+                            ),
+
+                            const SizedBox(height: 18),
+
+                            // ── Name + Age row ──
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: _dialogField(
+                                    controller: nameController,
+                                    label: 'PATIENT NAME *',
+                                    hint: 'full name',
+                                    icon: Icons.person_outline_rounded,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  flex: 2,
+                                  child: _dialogField(
+                                    controller: ageController,
+                                    label: 'AGE',
+                                    hint: 'yrs',
+                                    icon: Icons.cake_outlined,
+                                    keyboardType: TextInputType.number,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 14),
+
+                            // ── Gender selector ──
+                            Text(
+                              'GENDER',
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 9,
+                                color: const Color(0xFF888888),
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: ['M', 'F', 'Other'].map((g) {
+                                final selected = selectedGender == g;
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: GestureDetector(
+                                    onTap: () => setDialogState(
+                                        () => selectedGender = g),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 14, vertical: 9),
+                                      decoration: BoxDecoration(
+                                        color: selected
+                                            ? const Color(0xFFE8400A)
+                                                .withOpacity(0.1)
+                                            : const Color(0xFFECEDEF),
+                                        borderRadius:
+                                            BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: selected
+                                              ? const Color(0xFFE8400A)
+                                                  .withOpacity(0.5)
+                                              : const Color(0xFFD6D8DB),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        g,
+                                        style: GoogleFonts.jetBrainsMono(
+                                          color: selected
+                                              ? const Color(0xFFE8400A)
+                                              : const Color(0xFF555555),
+                                          fontSize: 11,
+                                          fontWeight: selected
+                                              ? FontWeight.w700
+                                              : FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+
+                            const SizedBox(height: 14),
+
+                            // ── BP + Weight row ──
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _dialogField(
+                                    controller: bpController,
+                                    label: 'BLOOD PRESSURE',
+                                    hint: '120/80',
+                                    icon: Icons.favorite_outline_rounded,
+                                    keyboardType: TextInputType.text,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: _dialogField(
+                                    controller: weightController,
+                                    label: 'WEIGHT',
+                                    hint: 'kg',
+                                    icon: Icons.monitor_weight_outlined,
+                                    keyboardType: TextInputType.number,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 14),
+
+                            // ── Reason ──
+                            _dialogField(
+                              controller: reasonController,
+                              label: 'REASON FOR VISIT *',
+                              hint: 'brief reason...',
+                              icon: Icons.notes_rounded,
+                            ),
+
+                            const SizedBox(height: 14),
+
+                            // ── Address ──
+                            _dialogField(
+                              controller: addressController,
+                              label: 'ADDRESS',
+                              hint: 'area / city',
+                              icon: Icons.location_on_outlined,
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // ── Buttons ──
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => Navigator.pop(context),
+                                    child: Container(
+                                      height: 44,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFECEDEF),
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                        border: Border.all(
+                                            color: const Color(0xFFD6D8DB),
+                                            width: 1),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'CANCEL',
+                                          style: GoogleFonts.jetBrainsMono(
+                                            color: const Color(0xFF888888),
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 11,
+                                            letterSpacing: 1.5,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      final name =
+                                          nameController.text.trim();
+                                      final reason =
+                                          reasonController.text.trim();
+                                      final age = ageController.text.trim();
+                                      final weight = weightController.text.trim();
+                                      final bloodPressure = bpController.text.trim();
+                                      final address = addressController.text.trim();
+                                      final gender = selectedGender;
+                                      if (name.isEmpty || reason.isEmpty) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'NAME and REASON are required.',
+                                              style:
+                                                  GoogleFonts.jetBrainsMono(
+                                                      fontSize: 11),
+                                            ),
+                                            backgroundColor:
+                                                const Color(0xFFE8400A),
+                                            duration: const Duration(
+                                                seconds: 2),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      ref
+                                          .read(queueProvider.notifier)
+                                          .addPatient(address: address, age: age, bloodPressure: bloodPressure, name: name, reason: reason, weight: weight, gender: gender);
+                                      // TODO: also pass age, gender, bp,
+                                      // weight, reason, address to backend
+                                      Navigator.pop(context);
+                                    },
+                                    child: Container(
+                                      height: 44,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFE8400A),
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'REGISTER',
+                                          style: GoogleFonts.jetBrainsMono(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 11,
+                                            letterSpacing: 1.5,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _dialogField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 9,
+            color: const Color(0xFF888888),
+            fontWeight: FontWeight.w500,
+            letterSpacing: 1.0,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Container(
+          height: 44,
+          decoration: BoxDecoration(
+            color: const Color(0xFFECEDEF),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                offset: const Offset(0, 2),
+                blurRadius: 4,
+              ),
+              const BoxShadow(
+                color: Colors.white,
+                offset: Offset(0, -1),
+                blurRadius: 2,
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const SizedBox(width: 10),
+              Icon(icon, size: 15, color: const Color(0xFF888888)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  keyboardType: keyboardType,
+                  style: GoogleFonts.jetBrainsMono(
+                    fontSize: 12,
+                    color: const Color(0xFF1A1A1A),
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    hintStyle: GoogleFonts.jetBrainsMono(
+                      fontSize: 12,
+                      color: const Color(0xFFAAAAAA),
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

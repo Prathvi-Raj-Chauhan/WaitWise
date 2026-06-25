@@ -3,7 +3,9 @@ import 'dart:html' as html;
 import 'dart:js' as js;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wait_wise/provider/provider.dart';
 import 'package:wait_wise/widgets/LiveClock.dart';
 
 class WaitRoom extends StatefulWidget {
@@ -107,8 +109,11 @@ class _WaitRoomState extends State<WaitRoom> {
                   ],
                 ),
                 const SizedBox(height: 8),
+
+                // middle containers
                 Row(
                   children: [
+                    // left box in mid
                     Expanded(
                       flex: 7,
                       child: Container(
@@ -128,45 +133,56 @@ class _WaitRoomState extends State<WaitRoom> {
                             ),
                           ],
                         ),
-                        child: Column(
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  "CURRENTLY_SERVING",
-                                  style: GoogleFonts.jetBrainsMono(
-                                    fontSize: 20,
-                                    color: Colors.grey.shade600,
-                                    letterSpacing: 2,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      "#7",
+                        child: Consumer(
+                          builder: (context, ref, child) {
+                            final queue = ref.watch(queueProvider);
+                            final hasToken = queue.currentToken != null;
+                            final currentNumber = queue.currentToken?.number
+                                .toString();
+                            return Column(
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      "CURRENTLY_SERVING",
                                       style: GoogleFonts.jetBrainsMono(
-                                        fontSize: 81,
-                                        color: Colors.deepOrange,
-                                        letterSpacing: 6,
-                                        fontWeight: FontWeight.w700,
+                                        fontSize: 20,
+                                        color: Colors.grey.shade600,
+                                        letterSpacing: 2,
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                                Expanded(
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          hasToken
+                                              ? '#${queue.currentToken!.number} - ${queue.currentToken!.name}'
+                                              : 'EMPTY',
+                                          style: GoogleFonts.jetBrainsMono(
+                                            fontSize: 81,
+                                            color: Colors.deepOrange,
+                                            letterSpacing: 6,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
                     ),
                     VerticalDivider(),
+                    // right waitqueue box in mid
                     Expanded(
                       flex: 3,
                       child: Container(
@@ -191,42 +207,52 @@ class _WaitRoomState extends State<WaitRoom> {
                             ),
                           ],
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 6),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0,
-                                vertical: 2,
-                              ),
-                              child: Text(
-                                'Up_Next',
-                                style: GoogleFonts.jetBrainsMono(
-                                  color: Colors.deepOrangeAccent,
-                                  fontWeight: FontWeight.w600,
+                        child: Consumer(
+                          builder: (context, ref, child) {
+                            final queue = ref.watch(queueProvider);
+                            final hasToken = queue.currentToken != null;
+                            final currentNumber = queue.currentToken?.number
+                                .toString();
+
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 6),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0,
+                                    vertical: 2,
+                                  ),
+                                  child: Text(
+                                    'Up_Next',
+                                    style: GoogleFonts.jetBrainsMono(
+                                      color: Colors.deepOrangeAccent,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0,
-                              ),
-                              child: Divider(color: Colors.grey[300]),
-                            ),
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: 8,
-                                itemBuilder: (_, index) {
-                                  return _upnextToken(
-                                    index + 1,
-                                    "PRC",
-                                    index % 2 == 0,
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0,
+                                  ),
+                                  child: Divider(color: Colors.grey[300]),
+                                ),
+                                Expanded(
+                                  child: queue.waiting.length == 0 ? Text("Empty") : ListView.builder(
+                                    itemCount: queue.waiting.length,
+                                    itemBuilder: (_, index) {
+                                      return _upnextToken(
+                                        queue.waiting.elementAt(index).number +
+                                            1,
+                                        queue.waiting.elementAt(index).name,
+                                        index % 2 == 0,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -241,6 +267,7 @@ class _WaitRoomState extends State<WaitRoom> {
                   ),
                 ),
                 const Spacer(),
+                // bottom orange docration orange box
                 Container(
                   height: 70,
                   decoration: BoxDecoration(
@@ -350,7 +377,7 @@ class _WaitRoomState extends State<WaitRoom> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Text("#$token", style: GoogleFonts.jetBrainsMono(color: col)),
+          Text("#$token" , style: GoogleFonts.jetBrainsMono(color: col)),
           Divider(),
           Text("Name : $name", style: GoogleFonts.jetBrainsMono(color: col)),
         ],
@@ -394,39 +421,43 @@ class __LiveWeatherState extends State<_LiveWeather> {
   }
 
   void _fetchWeatherWeb() {
-  html.window.navigator.geolocation.getCurrentPosition().then((pos) async {
-    final lat = pos.coords!.latitude!;
-    final lon = pos.coords!.longitude!;
+    html.window.navigator.geolocation
+        .getCurrentPosition()
+        .then((pos) async {
+          final lat = pos.coords!.latitude!;
+          final lon = pos.coords!.longitude!;
 
-    // run both requests in parallel
-    final results = await Future.wait([
-      Dio().get(
-        'https://api.open-meteo.com/v1/forecast'
-        '?latitude=$lat&longitude=$lon&current_weather=true'
-      ),
-      Dio().get(
-        
-          'https://nominatim.openstreetmap.org/reverse'
-          '?lat=$lat&lon=$lon&format=json'
-        ,
-        options:Options(headers:  {'User-Agent': 'WaitWise/1.0'}), // nominatim requires this
-      ),
-    ]);
+          // run both requests in parallel
+          final results = await Future.wait([
+            Dio().get(
+              'https://api.open-meteo.com/v1/forecast'
+              '?latitude=$lat&longitude=$lon&current_weather=true',
+            ),
+            Dio().get(
+              'https://nominatim.openstreetmap.org/reverse'
+              '?lat=$lat&lon=$lon&format=json',
+              options: Options(
+                headers: {'User-Agent': 'WaitWise/1.0'},
+              ), // nominatim requires this
+            ),
+          ]);
 
-    final weather = (results[0].data);
-    final geo = (results[1].data);
+          final weather = (results[0].data);
+          final geo = (results[1].data);
 
-    setState(() {
-      _temp = weather['current_weather']['temperature'];
-      // falls back through options: city → town → suburb → county
-      _city = geo['address']['city'] 
-           ?? geo['address']['town'] 
-           ?? geo['address']['suburb'] 
-           ?? geo['address']['county']
-           ?? 'Unknown';
-    });
-  }).catchError((e) {
-    debugPrint('Location error: $e');
-  });
-}
+          setState(() {
+            _temp = weather['current_weather']['temperature'];
+            // falls back through options: city → town → suburb → county
+            _city =
+                geo['address']['city'] ??
+                geo['address']['town'] ??
+                geo['address']['suburb'] ??
+                geo['address']['county'] ??
+                'Unknown';
+          });
+        })
+        .catchError((e) {
+          debugPrint('Location error: $e');
+        });
+  }
 }
