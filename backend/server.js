@@ -9,7 +9,7 @@ const authRouter = require("./router/auth")
 require("dotenv").config()
 
 app.use(cors({
-  origin: ['http://localhost:50978', 'http://localhost:50979'],
+  origin: ['http://localhost:50978', 'http://localhost:50979', 'http://localhost:50980'],
   credentials: true,               
 }))
 
@@ -70,11 +70,11 @@ socket.on("connection" , (sock) => {
         if (!name) return ack?.({ ok: false, error: "Name not provided" })
         if (!reason) return ack?.({ ok: false, error: "Reason not provided" })
 
-        const age    = data?.age    ? parseInt(data.age.toString().trim(), 10)    : null
-        const weight = data?.weight ? parseInt(data.weight.toString().trim(), 10) : null
+        const age    = data?.age.trim() || null
+        const weight = data?.weight.trim() || null 
         const bloodPressure = data?.bloodPressure?.trim() || null
-        const address       = data?.address?.trim()       || null
-        const gender        = data?.gender?.trim()        || null
+        const address       = data?.address?.trim() || null
+        const gender        = data?.gender?.trim() || null
  
         const clinic = getClinic(clinicId)
         const patient = {

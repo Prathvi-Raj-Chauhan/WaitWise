@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:wait_wise/provider/provider.dart';
 import 'package:wait_wise/screens/reception_screen.dart';
 import 'package:wait_wise/screens/register.dart';
+import 'package:wait_wise/screens/role_select_page.dart';
 import 'package:wait_wise/screens/wait_room.dart';
 import 'package:wait_wise/services/authService.dart';
 import 'package:wait_wise/widgets/clinicIdDialog.dart';
@@ -45,8 +46,18 @@ class _LoginPageState extends State<LoginPage> {
       password: _passController.text.trim(),
     );
     if (res == true) {
-      String clinicId = _generateClinicId();
-      _connect(ref, clinicId: clinicId, isReceptionist: true);
+      
+      setState(() {
+        _isLoading = true;;
+        
+      });
+      if (mounted) {
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_){
+            return  RoleSelectPage();
+          })
+        );
+    }
     }
     setState(() {
       _isLoading = false;
@@ -56,20 +67,19 @@ class _LoginPageState extends State<LoginPage> {
   void _connect(
     WidgetRef ref, {
     required String clinicId,
-    required bool isReceptionist,
   }) {
     final url = "http://localhost:9000";
     if (url.isEmpty) return;
     ref.read(serverUrlProvider.notifier).state = url;
     ref.read(clinicIdProvider.notifier).state = clinicId;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => isReceptionist
-            ? ReceptionPage(clinicId: clinicId)
-            : const WaitRoom(),
-      ),
-    );
+    Future.delayed(const Duration(seconds: 2), () {
+    if (mounted) {
+      setState(() => _isLoading = false);
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => WaitRoom()),
+      );
+    }
+  });
   }
 
   @override
@@ -171,7 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                           _connect(
                             ref,
                             clinicId: clinicId!,
-                            isReceptionist: false,
+            
                           );
                         },
                         child: Container(
@@ -448,7 +458,7 @@ class _LoginPageState extends State<LoginPage> {
                                   onTap: _isLoading
                                       ? null
                                       : () {
-                                          _handleLogin(ref);
+                                          _handleLogin(ref,);
                                         },
                                   child: Container(
                                     width: double.infinity,

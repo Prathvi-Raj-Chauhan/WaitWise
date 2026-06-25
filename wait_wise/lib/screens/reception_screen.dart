@@ -197,40 +197,40 @@ class _ReceptionPageState extends State<ReceptionPage> {
                                 ],
                               ),
                             ),
-                            GestureDetector(
-                              onTap: queue.connected
-                                  ? () => ref
-                                      .read(queueProvider.notifier)
-                                      .callNext()
-                                  : null,
-                              child: Container(
-                                width: 56,
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  color: queue.connected
-                                      ? const Color(0xFFE8400A)
-                                      : const Color(0xFFD6D8DB),
-                                  borderRadius: BorderRadius.circular(14),
-                                  boxShadow: queue.connected
-                                      ? [
-                                          BoxShadow(
-                                            color: const Color(0xFFE8400A)
-                                                .withOpacity(0.3),
-                                            blurRadius: 10,
-                                            offset: const Offset(0, 4),
-                                          ),
-                                        ]
-                                      : [],
-                                ),
-                                child: Icon(
-                                  Icons.skip_next_rounded,
-                                  color: queue.connected
-                                      ? Colors.white
-                                      : const Color(0xFF888888),
-                                  size: 26,
-                                ),
-                              ),
-                            ),
+                            // GestureDetector(
+                            //   onTap: queue.connected
+                            //       ? () => ref
+                            //           .read(queueProvider.notifier)
+                            //           .callNext()
+                            //       : null,
+                            //   child: Container(
+                            //     width: 56,
+                            //     height: 56,
+                            //     decoration: BoxDecoration(
+                            //       color: queue.connected
+                            //           ? const Color(0xFFE8400A)
+                            //           : const Color(0xFFD6D8DB),
+                            //       borderRadius: BorderRadius.circular(14),
+                            //       boxShadow: queue.connected
+                            //           ? [
+                            //               BoxShadow(
+                            //                 color: const Color(0xFFE8400A)
+                            //                     .withOpacity(0.3),
+                            //                 blurRadius: 10,
+                            //                 offset: const Offset(0, 4),
+                            //               ),
+                            //             ]
+                            //           : [],
+                            //     ),
+                            //     child: Icon(
+                            //       Icons.skip_next_rounded,
+                            //       color: queue.connected
+                            //           ? Colors.white
+                            //           : const Color(0xFF888888),
+                            //       size: 26,
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
