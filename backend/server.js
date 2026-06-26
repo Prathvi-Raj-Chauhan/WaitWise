@@ -45,6 +45,7 @@ app.use(globalLimiter);
 app.use(
   cors({
     origin: [
+      "http://localhost:6570",
       "https://waitwisebyprc.web.app"
     ],
     credentials: true,
