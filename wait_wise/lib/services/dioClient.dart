@@ -7,7 +7,6 @@ class Dioclient{
 
   static void init(){
     BaseOptions options = BaseOptions(
-      // baseUrl: "http://localhost:9000",
       baseUrl: "https://waitwise-jaoa.onrender.com",
       headers: {
         'Accept': 'application/json',

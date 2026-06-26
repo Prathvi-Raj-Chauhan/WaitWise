@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _connect(WidgetRef ref, {required String clinicId}) {
-    final url = "http://localhost:9000";
+    final url = "https://waitwise-jaoa.onrender.com";
     if (url.isEmpty) return;
     ref.read(serverUrlProvider.notifier).state = url;
     ref.read(clinicIdProvider.notifier).state = clinicId;

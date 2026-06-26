@@ -21,7 +21,7 @@ class _RoleSelectPageState extends State<RoleSelectPage> {
     required String clinicId,
     required bool isReceptionist,
   }) {
-    final url = "http://localhost:9000";
+    final url = "https://waitwise-jaoa.onrender.com";
     if (url.isEmpty) return;
     ref.read(serverUrlProvider.notifier).state = url;
     ref.read(clinicIdProvider.notifier).state = clinicId;
