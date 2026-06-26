@@ -52,7 +52,6 @@ class QueueState {
 
   QueueState optimisticCallNext() {
     if (waiting.isEmpty) return this;
-    final next = waiting.first;
     final nextDetailed = detailedPatients.first;
     return copyWith(
       currentToken: nextDetailed,

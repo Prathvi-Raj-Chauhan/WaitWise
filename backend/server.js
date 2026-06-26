@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const app = express();
+var cookieParser = require('cookie-parser')
 const { Server } = require("socket.io");
 const PORT = 9000;
 const server = http.createServer(app);
@@ -15,7 +16,7 @@ const { appointment } = require("./db/schema");
 const { db } = require("./db/index")      // or wherever your db instance lives
 const { eq, and } = require("drizzle-orm")
 require("dotenv").config();
-
+app.use(cookieParser())
 app.use(
   cors({
     origin: [

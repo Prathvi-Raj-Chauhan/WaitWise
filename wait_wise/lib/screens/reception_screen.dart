@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wait_wise/provider/provider.dart';
 
@@ -29,7 +30,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_rounded,
                   color: Color(0xFF888888), size: 20),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => context.go('/role-select'),
             ),
             title: Row(
               children: [

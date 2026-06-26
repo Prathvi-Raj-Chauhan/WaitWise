@@ -1,11 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wait_wise/core/app_snackbar.dart';
 import 'package:wait_wise/provider/provider.dart';
-import 'package:wait_wise/screens/login.dart';
-import 'package:wait_wise/screens/reception_screen.dart';
-import 'package:wait_wise/screens/tv_screen.dart';
 import 'package:wait_wise/services/authService.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -40,22 +39,31 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _handleRegister(WidgetRef ref) async {
-    setState(() => _isLoading = true);
+   
     if (_cnfpassController.text.trim() != _passController.text.trim()) {
+      if (mounted) AppSnackbar.error(context, 'Passwords do not match!');
       return;
     }
-    final res = await AuthService.register(
-      email: _emailController.text.trim(),
-      password: _passController.text.trim(),
-      name: _nameController.text.trim(),
-    );
-    if (res == true) {
-      String clinicId = _generateClinicId();
-      _connect(ref, clinicId: clinicId, isReceptionist: true);
+
+    setState(() => _isLoading = true);
+
+    try {
+      await AuthService.register(
+        email: _emailController.text.trim(),
+        password: _passController.text.trim(),
+        name: _nameController.text.trim(),
+      );
+      // only reaches here on success
+      if (mounted) {
+        AppSnackbar.success(context, 'Registered successfully!');
+        String clinicId = _generateClinicId();
+        _connect(ref, clinicId: clinicId, isReceptionist: true);
+      }
+    } catch (e) {
+      if (mounted) AppSnackbar.error(context, e.toString());
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   void _connect(
@@ -67,13 +75,9 @@ class _RegisterPageState extends State<RegisterPage> {
     if (url.isEmpty) return;
     ref.read(serverUrlProvider.notifier).state = url;
     ref.read(clinicIdProvider.notifier).state = clinicId;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) =>
-            isReceptionist ? ReceptionPage(clinicId: clinicId) : const tv(),
-      ),
-    );
+    if (mounted) {
+      context.go('/reception/$clinicId');
+    }
   }
 
   @override
@@ -444,9 +448,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                 // Execute button
                                 GestureDetector(
-                                  onTap: _isLoading ? null : (){
-                                    _handleRegister(ref);
-                                  },
+                                  onTap: _isLoading
+                                      ? null
+                                      : () {
+                                          _handleRegister(ref);
+                                        },
                                   child: Container(
                                     width: double.infinity,
                                     height: 46,
@@ -493,11 +499,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       ),
                                       GestureDetector(
                                         onTap: () {
-                                          Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder: (context) => LoginPage(),
-                                            ),
-                                          );
+                                          context.push('/login');
                                         },
                                         child: Text(
                                           'LOGIN NOW',

@@ -3,6 +3,7 @@ import 'dart:html' as html;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wait_wise/provider/provider.dart';
 import 'package:wait_wise/widgets/LiveClock.dart';
@@ -25,7 +26,16 @@ class _DoctorScreenState extends State<DoctorScreen> {
   }
 
   String _week(int day) {
-    const days = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const days = [
+      '',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
     return days[day];
   }
 
@@ -36,7 +46,7 @@ class _DoctorScreenState extends State<DoctorScreen> {
       body: Center(
         child: Container(
           width: MediaQuery.of(context).size.width * 0.85,
-          height: MediaQuery.of(context).size.height * 0.90,
+          height: MediaQuery.of(context).size.height * 0.92,
           decoration: BoxDecoration(
             color: const Color(0xFFF5F6F7),
             boxShadow: [
@@ -73,8 +83,59 @@ class _DoctorScreenState extends State<DoctorScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Icon(Icons.medical_services_outlined,
-                            color: Colors.grey, size: 15),
+                        const Icon(
+                          Icons.medical_services_outlined,
+                          color: Colors.grey,
+                          size: 15,
+                        ),
+                        const SizedBox(height: 15,),
+                        GestureDetector(
+                          onTap: () {
+                            context.go('/patient-history');
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                const Color(0xFFE8400A),
+                                  
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color:const Color(0xFFE8400A).withOpacity(0.3),
+                                   
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 5,
+                                  height: 5,
+                                  decoration: BoxDecoration(
+                                    color:  const Color.fromARGB(255, 255, 255, 255) ,
+                            
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  "Patient Record",
+                                  style: GoogleFonts.jetBrainsMono(
+                                    fontSize: 9,
+                                    color: const Color.fromARGB(255, 255, 255, 255),
+                            
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 20),
                         const _LiveWeather(),
                       ],
@@ -97,7 +158,6 @@ class _DoctorScreenState extends State<DoctorScreen> {
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
                           // ── LEFT: current patient panel ──
                           Expanded(
                             flex: 7,
@@ -119,9 +179,15 @@ class _DoctorScreenState extends State<DoctorScreen> {
                                 children: [
                                   // Panel header
                                   Padding(
-                                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
+                                    padding: const EdgeInsets.fromLTRB(
+                                      14,
+                                      12,
+                                      14,
+                                      0,
+                                    ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           'Q_CORE // CURRENT_PATIENT',
@@ -145,10 +211,11 @@ class _DoctorScreenState extends State<DoctorScreen> {
 
                                   const SizedBox(height: 8),
                                   Divider(
-                                      color: Colors.grey.shade400,
-                                      height: 1,
-                                      indent: 14,
-                                      endIndent: 14),
+                                    color: Colors.grey.shade400,
+                                    height: 1,
+                                    indent: 14,
+                                    endIndent: 14,
+                                  ),
 
                                   current == null
                                       ? Expanded(
@@ -167,33 +234,49 @@ class _DoctorScreenState extends State<DoctorScreen> {
                                           child: Padding(
                                             padding: const EdgeInsets.all(20),
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 // Token + name big display
                                                 Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
                                                   children: [
                                                     Text(
                                                       '#${current.number}',
-                                                      style: GoogleFonts.jetBrainsMono(
-                                                        fontSize: 72,
-                                                        color: const Color(0xFFE8400A),
-                                                        fontWeight: FontWeight.w800,
-                                                        letterSpacing: -2,
-                                                        height: 1,
-                                                      ),
+                                                      style:
+                                                          GoogleFonts.jetBrainsMono(
+                                                            fontSize: 72,
+                                                            color: const Color(
+                                                              0xFFE8400A,
+                                                            ),
+                                                            fontWeight:
+                                                                FontWeight.w800,
+                                                            letterSpacing: -2,
+                                                            height: 1,
+                                                          ),
                                                     ),
                                                     const SizedBox(width: 16),
                                                     Padding(
-                                                      padding: const EdgeInsets.only(bottom: 10),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                            bottom: 10,
+                                                          ),
                                                       child: Text(
-                                                        current.name.toUpperCase(),
-                                                        style: GoogleFonts.jetBrainsMono(
-                                                          fontSize: 22,
-                                                          color: const Color(0xFF1A1A1A),
-                                                          fontWeight: FontWeight.w700,
-                                                          letterSpacing: 2,
-                                                        ),
+                                                        current.name
+                                                            .toUpperCase(),
+                                                        style:
+                                                            GoogleFonts.jetBrainsMono(
+                                                              fontSize: 22,
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF1A1A1A,
+                                                                  ),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              letterSpacing: 2,
+                                                            ),
                                                       ),
                                                     ),
                                                   ],
@@ -207,45 +290,104 @@ class _DoctorScreenState extends State<DoctorScreen> {
                                                   runSpacing: 12,
                                                   children: [
                                                     if (current.age != null)
-                                                      _detailChip('AGE', '${current.age} yrs', Icons.cake_outlined),
-                                                    if (current.gender != null && current.gender!.isNotEmpty)
-                                                      _detailChip('GENDER', current.gender!, Icons.person_outline_rounded),
-                                                    if (current.bloodPressure != null && current.bloodPressure!.isNotEmpty)
-                                                      _detailChip('BP', current.bloodPressure!, Icons.favorite_outline_rounded),
+                                                      _detailChip(
+                                                        'AGE',
+                                                        '${current.age} yrs',
+                                                        Icons.cake_outlined,
+                                                      ),
+                                                    if (current.gender !=
+                                                            null &&
+                                                        current
+                                                            .gender!
+                                                            .isNotEmpty)
+                                                      _detailChip(
+                                                        'GENDER',
+                                                        current.gender!,
+                                                        Icons
+                                                            .person_outline_rounded,
+                                                      ),
+                                                    if (current.bloodPressure !=
+                                                            null &&
+                                                        current
+                                                            .bloodPressure!
+                                                            .isNotEmpty)
+                                                      _detailChip(
+                                                        'BP',
+                                                        current.bloodPressure!,
+                                                        Icons
+                                                            .favorite_outline_rounded,
+                                                      ),
                                                     if (current.weight != null)
-                                                      _detailChip('WEIGHT', '${current.weight} kg', Icons.monitor_weight_outlined),
-                                                    if (current.address != null && current.address!.isNotEmpty)
-                                                      _detailChip('ADDR', current.address!, Icons.location_on_outlined),
+                                                      _detailChip(
+                                                        'WEIGHT',
+                                                        '${current.weight} kg',
+                                                        Icons
+                                                            .monitor_weight_outlined,
+                                                      ),
+                                                    if (current.address !=
+                                                            null &&
+                                                        current
+                                                            .address!
+                                                            .isNotEmpty)
+                                                      _detailChip(
+                                                        'ADDR',
+                                                        current.address!,
+                                                        Icons
+                                                            .location_on_outlined,
+                                                      ),
                                                   ],
                                                 ),
 
                                                 const SizedBox(height: 20),
 
                                                 // ── Reason box ──
-                                                if (current.reason.isNotEmpty) ...[
+                                                if (current
+                                                    .reason
+                                                    .isNotEmpty) ...[
                                                   Text(
                                                     'REASON_FOR_VISIT',
-                                                    style: GoogleFonts.jetBrainsMono(
-                                                      fontSize: 9,
-                                                      color: const Color(0xFFE8400A),
-                                                      fontWeight: FontWeight.w600,
-                                                      letterSpacing: 1.5,
-                                                    ),
+                                                    style:
+                                                        GoogleFonts.jetBrainsMono(
+                                                          fontSize: 9,
+                                                          color: const Color(
+                                                            0xFFE8400A,
+                                                          ),
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          letterSpacing: 1.5,
+                                                        ),
                                                   ),
                                                   const SizedBox(height: 6),
                                                   Container(
                                                     width: double.infinity,
-                                                    padding: const EdgeInsets.all(14),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                          14,
+                                                        ),
                                                     decoration: BoxDecoration(
-                                                      color: const Color(0xFFF5F6F7),
-                                                      borderRadius: BorderRadius.circular(12),
+                                                      color: const Color(
+                                                        0xFFF5F6F7,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            12,
+                                                          ),
                                                       border: Border.all(
-                                                          color: const Color(0xFFD6D8DB),
-                                                          width: 1),
+                                                        color: const Color(
+                                                          0xFFD6D8DB,
+                                                        ),
+                                                        width: 1,
+                                                      ),
                                                       boxShadow: [
                                                         BoxShadow(
-                                                          color: Colors.black.withOpacity(0.04),
-                                                          offset: const Offset(0, 2),
+                                                          color: Colors.black
+                                                              .withOpacity(
+                                                                0.04,
+                                                              ),
+                                                          offset: const Offset(
+                                                            0,
+                                                            2,
+                                                          ),
                                                           blurRadius: 4,
                                                         ),
                                                         const BoxShadow(
@@ -257,12 +399,16 @@ class _DoctorScreenState extends State<DoctorScreen> {
                                                     ),
                                                     child: Text(
                                                       current.reason,
-                                                      style: GoogleFonts.jetBrainsMono(
-                                                        fontSize: 13,
-                                                        color: const Color(0xFF1A1A1A),
-                                                        fontWeight: FontWeight.w500,
-                                                        height: 1.5,
-                                                      ),
+                                                      style:
+                                                          GoogleFonts.jetBrainsMono(
+                                                            fontSize: 13,
+                                                            color: const Color(
+                                                              0xFF1A1A1A,
+                                                            ),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            height: 1.5,
+                                                          ),
                                                     ),
                                                   ),
                                                 ],
@@ -301,7 +447,12 @@ class _DoctorScreenState extends State<DoctorScreen> {
                                 children: [
                                   // Header
                                   Padding(
-                                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
+                                    padding: const EdgeInsets.fromLTRB(
+                                      14,
+                                      12,
+                                      14,
+                                      0,
+                                    ),
                                     child: Text(
                                       'OPERATION LOGS',
                                       style: GoogleFonts.jetBrainsMono(
@@ -314,15 +465,18 @@ class _DoctorScreenState extends State<DoctorScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Divider(
-                                      color: Colors.grey.shade200,
-                                      height: 1,
-                                      indent: 14,
-                                      endIndent: 14),
+                                    color: Colors.grey.shade200,
+                                    height: 1,
+                                    indent: 14,
+                                    endIndent: 14,
+                                  ),
                                   const SizedBox(height: 8),
 
                                   // Next patient preview
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                    ),
                                     child: Text(
                                       'UP_NEXT',
                                       style: GoogleFonts.jetBrainsMono(
@@ -335,7 +489,9 @@ class _DoctorScreenState extends State<DoctorScreen> {
                                   ),
                                   const SizedBox(height: 6),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                    ),
                                     child: next == null
                                         ? Text(
                                             'QUEUE_EMPTY',
@@ -349,34 +505,48 @@ class _DoctorScreenState extends State<DoctorScreen> {
                                             padding: const EdgeInsets.all(10),
                                             decoration: BoxDecoration(
                                               color: const Color(0xFFECEDEF),
-                                              borderRadius: BorderRadius.circular(10),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                               border: Border.all(
-                                                  color: const Color(0xFFD6D8DB),
-                                                  width: 1),
+                                                color: const Color(0xFFD6D8DB),
+                                                width: 1,
+                                              ),
                                             ),
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Row(
                                                   children: [
                                                     Text(
                                                       '#${next.number}',
-                                                      style: GoogleFonts.jetBrainsMono(
-                                                        fontSize: 18,
-                                                        color: const Color(0xFFE8400A),
-                                                        fontWeight: FontWeight.w800,
-                                                      ),
+                                                      style:
+                                                          GoogleFonts.jetBrainsMono(
+                                                            fontSize: 18,
+                                                            color: const Color(
+                                                              0xFFE8400A,
+                                                            ),
+                                                            fontWeight:
+                                                                FontWeight.w800,
+                                                          ),
                                                     ),
                                                     const SizedBox(width: 8),
                                                     Expanded(
                                                       child: Text(
                                                         next.name,
-                                                        style: GoogleFonts.jetBrainsMono(
-                                                          fontSize: 12,
-                                                          color: const Color(0xFF1A1A1A),
-                                                          fontWeight: FontWeight.w600,
-                                                        ),
-                                                        overflow: TextOverflow.ellipsis,
+                                                        style:
+                                                            GoogleFonts.jetBrainsMono(
+                                                              fontSize: 12,
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF1A1A1A,
+                                                                  ),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                       ),
                                                     ),
                                                   ],
@@ -385,12 +555,16 @@ class _DoctorScreenState extends State<DoctorScreen> {
                                                   const SizedBox(height: 4),
                                                   Text(
                                                     next.reason,
-                                                    style: GoogleFonts.jetBrainsMono(
-                                                      fontSize: 9,
-                                                      color: Colors.grey.shade500,
-                                                    ),
+                                                    style:
+                                                        GoogleFonts.jetBrainsMono(
+                                                          fontSize: 9,
+                                                          color: Colors
+                                                              .grey
+                                                              .shade500,
+                                                        ),
                                                     maxLines: 2,
-                                                    overflow: TextOverflow.ellipsis,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
                                                 ],
                                               ],
@@ -400,15 +574,18 @@ class _DoctorScreenState extends State<DoctorScreen> {
 
                                   const SizedBox(height: 14),
                                   Divider(
-                                      color: Colors.grey.shade200,
-                                      height: 1,
-                                      indent: 14,
-                                      endIndent: 14),
+                                    color: Colors.grey.shade200,
+                                    height: 1,
+                                    indent: 14,
+                                    endIndent: 14,
+                                  ),
                                   const SizedBox(height: 8),
 
                                   // Queue log list
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                    ),
                                     child: Text(
                                       'QUEUE_LOG',
                                       style: GoogleFonts.jetBrainsMono(
@@ -423,7 +600,9 @@ class _DoctorScreenState extends State<DoctorScreen> {
                                   Expanded(
                                     child: queue.detailedPatients.isEmpty
                                         ? Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 14,
+                                            ),
                                             child: Text(
                                               'NO PATIENTS IN QUEUE',
                                               style: GoogleFonts.jetBrainsMono(
@@ -433,37 +612,56 @@ class _DoctorScreenState extends State<DoctorScreen> {
                                             ),
                                           )
                                         : ListView.builder(
-                                            padding: const EdgeInsets.symmetric(horizontal: 14),
-                                            itemCount: queue.detailedPatients.length,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 14,
+                                            ),
+                                            itemCount:
+                                                queue.detailedPatients.length,
                                             itemBuilder: (_, i) {
-                                              final p = queue.detailedPatients[i];
+                                              final p =
+                                                  queue.detailedPatients[i];
                                               final isNext = i == 0;
                                               return Padding(
-                                                padding: const EdgeInsets.only(bottom: 6),
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 6,
+                                                ),
                                                 child: Row(
                                                   children: [
                                                     Text(
                                                       '#${p.number}',
-                                                      style: GoogleFonts.jetBrainsMono(
-                                                        fontSize: 10,
-                                                        color: isNext
-                                                            ? const Color(0xFFE8400A)
-                                                            : Colors.grey.shade500,
-                                                        fontWeight: FontWeight.w700,
-                                                      ),
+                                                      style:
+                                                          GoogleFonts.jetBrainsMono(
+                                                            fontSize: 10,
+                                                            color: isNext
+                                                                ? const Color(
+                                                                    0xFFE8400A,
+                                                                  )
+                                                                : Colors
+                                                                      .grey
+                                                                      .shade500,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                          ),
                                                     ),
                                                     const SizedBox(width: 8),
                                                     Expanded(
                                                       child: Text(
                                                         p.name,
-                                                        style: GoogleFonts.jetBrainsMono(
-                                                          fontSize: 10,
-                                                          color: const Color(0xFF555555),
-                                                          fontWeight: isNext
-                                                              ? FontWeight.w600
-                                                              : FontWeight.w400,
-                                                        ),
-                                                        overflow: TextOverflow.ellipsis,
+                                                        style:
+                                                            GoogleFonts.jetBrainsMono(
+                                                              fontSize: 10,
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF555555,
+                                                                  ),
+                                                              fontWeight: isNext
+                                                                  ? FontWeight
+                                                                        .w600
+                                                                  : FontWeight
+                                                                        .w400,
+                                                            ),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                       ),
                                                     ),
                                                   ],
@@ -478,10 +676,16 @@ class _DoctorScreenState extends State<DoctorScreen> {
                                     padding: const EdgeInsets.all(14),
                                     child: Consumer(
                                       builder: (context, ref, _) {
-                                        final connected = ref.watch(queueProvider).connected;
+                                        final connected = ref
+                                            .watch(queueProvider)
+                                            .connected;
                                         return GestureDetector(
                                           onTap: connected
-                                              ? () => ref.read(queueProvider.notifier).callNext()
+                                              ? () => ref
+                                                    .read(
+                                                      queueProvider.notifier,
+                                                    )
+                                                    .callNext()
                                               : null,
                                           child: Container(
                                             width: double.infinity,
@@ -490,19 +694,22 @@ class _DoctorScreenState extends State<DoctorScreen> {
                                               color: connected
                                                   ? const Color(0xFFE8400A)
                                                   : const Color(0xFFD6D8DB),
-                                              borderRadius: BorderRadius.circular(12),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                             ),
                                             child: Center(
                                               child: Text(
                                                 'CALL_NEXT',
-                                                style: GoogleFonts.jetBrainsMono(
-                                                  color: connected
-                                                      ? Colors.white
-                                                      : Colors.grey,
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 11,
-                                                  letterSpacing: 1.5,
-                                                ),
+                                                style:
+                                                    GoogleFonts.jetBrainsMono(
+                                                      color: connected
+                                                          ? Colors.white
+                                                          : Colors.grey,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontSize: 11,
+                                                      letterSpacing: 1.5,
+                                                    ),
                                               ),
                                             ),
                                           ),
@@ -523,64 +730,71 @@ class _DoctorScreenState extends State<DoctorScreen> {
                 const SizedBox(height: 10),
 
                 // ── Footer label ──
-                Consumer(builder: (context, ref, _) {
-                  final queue = ref.watch(queueProvider);
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Wait_Wise // DOCTOR_VIEW',
-                        style: GoogleFonts.jetBrainsMono(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey,
-                          fontSize: 11,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: queue.connected
-                              ? const Color(0xFFE8400A).withOpacity(0.12)
-                              : Colors.grey.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: queue.connected
-                                ? const Color(0xFFE8400A).withOpacity(0.3)
-                                : Colors.grey.withOpacity(0.3),
-                            width: 1,
+                Consumer(
+                  builder: (context, ref, _) {
+                    final queue = ref.watch(queueProvider);
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Wait_Wise // DOCTOR_VIEW',
+                          style: GoogleFonts.jetBrainsMono(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey,
+                            fontSize: 11,
                           ),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 5,
-                              height: 5,
-                              decoration: BoxDecoration(
-                                color: queue.connected
-                                    ? const Color(0xFFE8400A)
-                                    : Colors.grey,
-                                shape: BoxShape.circle,
-                              ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: queue.connected
+                                ? const Color(0xFFE8400A).withOpacity(0.12)
+                                : Colors.grey.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: queue.connected
+                                  ? const Color(0xFFE8400A).withOpacity(0.3)
+                                  : Colors.grey.withOpacity(0.3),
+                              width: 1,
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              queue.connected ? 'SYNC_ACTIVE' : 'SYNC_INACTIVE',
-                              style: GoogleFonts.jetBrainsMono(
-                                fontSize: 9,
-                                color: queue.connected
-                                    ? const Color(0xFFE8400A)
-                                    : Colors.grey,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 1.0,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 5,
+                                height: 5,
+                                decoration: BoxDecoration(
+                                  color: queue.connected
+                                      ? const Color(0xFFE8400A)
+                                      : Colors.grey,
+                                  shape: BoxShape.circle,
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 6),
+                              Text(
+                                queue.connected
+                                    ? 'SYNC_ACTIVE'
+                                    : 'SYNC_INACTIVE',
+                                style: GoogleFonts.jetBrainsMono(
+                                  fontSize: 9,
+                                  color: queue.connected
+                                      ? const Color(0xFFE8400A)
+                                      : Colors.grey,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  );
-                }),
+                      ],
+                    );
+                  },
+                ),
 
                 const SizedBox(height: 8),
 
@@ -598,23 +812,32 @@ class _DoctorScreenState extends State<DoctorScreen> {
                     ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('BOOT',
-                                style: GoogleFonts.jetBrainsMono(
-                                    fontSize: 10,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
-                            Text('VERIFY',
-                                style: GoogleFonts.jetBrainsMono(
-                                    fontSize: 10,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
+                            Text(
+                              'BOOT',
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 10,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'VERIFY',
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 10,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 5),
@@ -643,12 +866,20 @@ class _DoctorScreenState extends State<DoctorScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('RDY',
-                                style: GoogleFonts.jetBrainsMono(
-                                    fontSize: 10, color: Colors.white)),
-                            Text('PRC',
-                                style: GoogleFonts.jetBrainsMono(
-                                    fontSize: 10, color: Colors.white)),
+                            Text(
+                              'RDY',
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 10,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              'PRC',
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 10,
+                                color: Colors.white,
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -732,7 +963,10 @@ class __LiveWeatherState extends State<_LiveWeather> {
   void initState() {
     super.initState();
     _fetchWeatherWeb();
-    _timer = Timer.periodic(const Duration(minutes: 25), (_) => _fetchWeatherWeb());
+    _timer = Timer.periodic(
+      const Duration(minutes: 25),
+      (_) => _fetchWeatherWeb(),
+    );
   }
 
   @override
@@ -742,29 +976,35 @@ class __LiveWeatherState extends State<_LiveWeather> {
   }
 
   void _fetchWeatherWeb() {
-    html.window.navigator.geolocation.getCurrentPosition().then((pos) async {
-      final lat = pos.coords!.latitude!;
-      final lon = pos.coords!.longitude!;
-      final results = await Future.wait([
-        Dio().get(
-          'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current_weather=true',
-        ),
-        Dio().get(
-          'https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lon&format=json',
-          options: Options(headers: {'User-Agent': 'WaitWise/1.0'}),
-        ),
-      ]);
-      final weather = results[0].data;
-      final geo = results[1].data;
-      setState(() {
-        _temp = weather['current_weather']['temperature'];
-        _city = geo['address']['city'] ??
-            geo['address']['town'] ??
-            geo['address']['suburb'] ??
-            geo['address']['county'] ??
-            'Unknown';
-      });
-    }).catchError((e) => debugPrint('Location error: $e'));
+    html.window.navigator.geolocation
+        .getCurrentPosition()
+        .then((pos) async {
+          final lat = pos.coords!.latitude!;
+          final lon = pos.coords!.longitude!;
+          final results = await Future.wait([
+            Dio().get(
+              'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current_weather=true',
+            ),
+            Dio().get(
+              'https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lon&format=json',
+              options: Options(headers: {'User-Agent': 'WaitWise/1.0'}),
+            ),
+          ]);
+          final weather = results[0].data;
+          final geo = results[1].data;
+          setState(() {
+            _temp = weather['current_weather']['temperature'];
+            _city =
+                geo['address']['city'] ??
+                geo['address']['town'] ??
+                geo['address']['suburb'] ??
+                geo['address']['county'] ??
+                'Unknown';
+          });
+        })
+        .catchError((e) {
+          debugPrint('Location error: $e');
+        });
   }
 
   @override

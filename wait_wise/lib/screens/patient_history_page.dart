@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wait_wise/model/PatientHistory.dart';
 import 'package:wait_wise/services/dioClient.dart';
 
 // Model for history records
-
 
 class PatientHistoryPage extends StatefulWidget {
   const PatientHistoryPage({super.key});
@@ -16,103 +16,108 @@ class PatientHistoryPage extends StatefulWidget {
 }
 
 class _PatientHistoryPageState extends State<PatientHistoryPage> {
-  
   final _searchController = TextEditingController();
   DateTimeRange? _selectedRange;
   String _selectedStatus = 'all';
   bool _isLoading = false;
   List<PatientRecord> _records = [];
   List<PatientRecord> _filtered = [];
-  late var clinicId;
-  void setupClinicId()async{
+  late var clinicId = "";
+  Future<void> setupClinicId() async {
     final pref = await SharedPreferences.getInstance();
+    final id = pref.get('clinicDbId')?.toString() ?? '';
     setState(() {
-      clinicId = pref.get('clinicDbId');
+      clinicId = id;
     });
   }
-
 
   Future<void> _fetchHistory() async {
-  setState(() => _isLoading = true);
+    setState(() => _isLoading = true);
 
-  try {
-    final queryParams = <String, dynamic>{};
+    try {
+      final queryParams = <String, dynamic>{};
 
-    if (_selectedRange != null) {
-      queryParams['from'] = _selectedRange!.start.toIso8601String();
-      queryParams['to']   = _selectedRange!.end.toIso8601String();
-    }
+      if (_selectedRange != null) {
+        queryParams['from'] = _selectedRange!.start.toIso8601String();
+        queryParams['to'] = _selectedRange!.end.toIso8601String();
+      }
 
-    if (_selectedStatus != 'all') {
-      queryParams['status'] = _selectedStatus;
-    }
+      if (_selectedStatus != 'all') {
+        queryParams['status'] = _selectedStatus;
+      }
 
-    // Name search is handled client-side for instant feedback,
-    // but you can also pass it here if you want server-side filtering:
-    // if (_searchController.text.trim().isNotEmpty) {
-    //   queryParams['name'] = _searchController.text.trim();
-    // }
+      // Name search is handled client-side for instant feedback,
+      // but you can also pass it here if you want server-side filtering:
+      // if (_searchController.text.trim().isNotEmpty) {
+      //   queryParams['name'] = _searchController.text.trim();
+      // }
 
-    final response = await Dioclient.dio.get(
-      '/history/${clinicId}',
-      queryParameters: queryParams.isNotEmpty ? queryParams : null,
-    );
-
-    // Backend returns { count: int, records: [...] }
-    final List<dynamic> raw = response.data['records'] ?? [];
-
-    final parsed = raw.map((json) {
-      // addedAt is stored as a ms-epoch string, e.g. "1718000000000"
-      final addedAtRaw = json['addedAt'];
-      final addedAtMs  = int.tryParse(addedAtRaw.toString());
-      final addedAt    = addedAtMs != null
-          ? DateTime.fromMillisecondsSinceEpoch(addedAtMs)
-          : DateTime.tryParse(addedAtRaw.toString()) ?? DateTime.now();
-
-      return PatientRecord(
-        id:            json['id'],
-        name:          json['name'] ?? '',
-        age:           json['age'],
-        gender:        json['gender'],
-        bloodPressure: json['bloodPressure'],
-        weight:        json['weight']?.toString(),
-        reason:        json['reason'] ?? '',
-        address:       json['address'],
-        status:        json['status'] ?? 'pending',
-        addedAt:       addedAt,
+      final response = await Dioclient.dio.get(
+        '/history/${clinicId}',
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
       );
-    }).toList();
 
-    setState(() {
-      _records = parsed;
-      _isLoading = false;
-    });
+      // Backend returns { count: int, records: [...] }
+      final List<dynamic> raw = response.data['records'] ?? [];
 
-    _applyFilters();
-  } on DioException catch (e) {
-    setState(() => _isLoading = false);
+      final parsed = raw.map((json) {
+        // addedAt is stored as a ms-epoch string, e.g. "1718000000000"
+        final addedAtRaw = json['addedAt'];
+        final addedAtMs = int.tryParse(addedAtRaw.toString());
+        final addedAt = addedAtMs != null
+            ? DateTime.fromMillisecondsSinceEpoch(addedAtMs)
+            : DateTime.tryParse(addedAtRaw.toString()) ?? DateTime.now();
 
-    final msg = e.response?.data?['error'] ?? 'Failed to fetch history';
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(msg),
-          backgroundColor: const Color(0xFFE8400A),
-        ),
-      );
+        return PatientRecord(
+          id: json['id'],
+          name: json['name'] ?? '',
+          age: json['age'],
+          gender: json['gender'],
+          bloodPressure: json['bloodPressure'],
+          weight: json['weight']?.toString(),
+          reason: json['reason'] ?? '',
+          address: json['address'],
+          status: json['status'] ?? 'pending',
+          addedAt: addedAt,
+        );
+      }).toList();
+
+      setState(() {
+        _records = parsed;
+        _isLoading = false;
+      });
+
+      _applyFilters();
+    } on DioException catch (e) {
+      setState(() => _isLoading = false);
+
+      final msg = e.response?.data?['error'] ?? 'Failed to fetch history';
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(msg),
+            backgroundColor: const Color(0xFFE8400A),
+          ),
+        );
+      }
     }
   }
-}
 
   void _applyFilters() {
     final query = _searchController.text.trim().toLowerCase();
     setState(() {
       _filtered = _records.where((r) {
-        final matchName   = query.isEmpty || r.name.toLowerCase().contains(query);
-        final matchStatus = _selectedStatus == 'all' || r.status == _selectedStatus;
-        final matchDate   = _selectedRange == null ||
-            (r.addedAt.isAfter(_selectedRange!.start.subtract(const Duration(days: 1))) &&
-             r.addedAt.isBefore(_selectedRange!.end.add(const Duration(days: 1))));
+        final matchName = query.isEmpty || r.name.toLowerCase().contains(query);
+        final matchStatus =
+            _selectedStatus == 'all' || r.status == _selectedStatus;
+        final matchDate =
+            _selectedRange == null ||
+            (r.addedAt.isAfter(
+                  _selectedRange!.start.subtract(const Duration(days: 1)),
+                ) &&
+                r.addedAt.isBefore(
+                  _selectedRange!.end.add(const Duration(days: 1)),
+                ));
         return matchName && matchStatus && matchDate;
       }).toList();
     });
@@ -144,9 +149,9 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
   void _clearFilters() {
     _searchController.clear();
     setState(() {
-      _selectedRange  = null;
+      _selectedRange = null;
       _selectedStatus = 'all';
-      _filtered       = List.from(_records);
+      _filtered = List.from(_records);
     });
   }
 
@@ -156,8 +161,12 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
   @override
   void initState() {
     super.initState();
-    setupClinicId();
-    _fetchHistory();
+    _initAndFetch();
+  }
+
+  Future<void> _initAndFetch() async {
+    await setupClinicId(); // wait for clinicId to be ready
+    _fetchHistory(); // only then fetch
   }
 
   @override
@@ -175,14 +184,25 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded,
-              color: Color(0xFF888888), size: 20),
-          onPressed: () => Navigator.pop(context),
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: Color(0xFF888888),
+            size: 20,
+          ),
+          onPressed: () => context.go('/doctor'),
         ),
         title: Row(
           children: [
-            const Icon(Icons.history_rounded,
-                color: Color(0xFFE8400A), size: 16),
+            GestureDetector(
+              onTap: (){
+                _fetchHistory();
+              },
+              child: const Icon(
+                Icons.history_rounded,
+                color: Color(0xFFE8400A),
+                size: 16,
+              ),
+            ),
             const SizedBox(width: 8),
             Text(
               'PATIENT HISTORY',
@@ -221,7 +241,6 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // ── Filter bar ──
             Container(
               padding: const EdgeInsets.all(14),
@@ -324,10 +343,15 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
                             color: const Color(0xFFECEDEF),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                                color: const Color(0xFFD6D8DB), width: 1),
+                              color: const Color(0xFFD6D8DB),
+                              width: 1,
+                            ),
                           ),
-                          child: const Icon(Icons.clear_rounded,
-                              size: 16, color: Color(0xFF888888)),
+                          child: const Icon(
+                            Icons.clear_rounded,
+                            size: 16,
+                            color: Color(0xFF888888),
+                          ),
                         ),
                       ),
                     ],
@@ -348,7 +372,9 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: active
                                   ? const Color(0xFFE8400A).withOpacity(0.1)
@@ -411,66 +437,63 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
                       ),
                     )
                   : _filtered.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 52,
-                                height: 52,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFECEDEF),
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                      color: const Color(0xFFD6D8DB),
-                                      width: 1),
-                                ),
-                                child: const Icon(
-                                  Icons.inbox_outlined,
-                                  color: Color(0xFF888888),
-                                  size: 24,
-                                ),
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 52,
+                            height: 52,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFECEDEF),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: const Color(0xFFD6D8DB),
+                                width: 1,
                               ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'NO RECORDS FOUND',
-                                style: GoogleFonts.jetBrainsMono(
-                                  color: const Color(0xFF1A1A1A),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 1.0,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Try adjusting your filters.',
-                                style: GoogleFonts.jetBrainsMono(
-                                  color: const Color(0xFF888888),
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ],
+                            ),
+                            child: const Icon(
+                              Icons.inbox_outlined,
+                              color: Color(0xFF888888),
+                              size: 24,
+                            ),
                           ),
-                        )
-                      : ListView.separated(
-                          itemCount: _filtered.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 8),
-                          itemBuilder: (_, i) =>
-                              _recordCard(_filtered[i]),
-                        ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'NO RECORDS FOUND',
+                            style: GoogleFonts.jetBrainsMono(
+                              color: const Color(0xFF1A1A1A),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Try adjusting your filters.',
+                            style: GoogleFonts.jetBrainsMono(
+                              color: const Color(0xFF888888),
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.separated(
+                      itemCount: _filtered.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 8),
+                      itemBuilder: (_, i) => _recordCard(_filtered[i]),
+                    ),
             ),
 
             // ── Bottom log strip ──
             const SizedBox(height: 12),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: const Color(0xFFECEDEF),
                 borderRadius: BorderRadius.circular(10),
-                border:
-                    Border.all(color: const Color(0xFFD6D8DB), width: 1),
+                border: Border.all(color: const Color(0xFFD6D8DB), width: 1),
               ),
               child: Row(
                 children: [
@@ -505,8 +528,7 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
     return GestureDetector(
       onTap: () => _showDetailSheet(r),
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: const Color(0xFFF5F6F7),
           borderRadius: BorderRadius.circular(12),
@@ -584,7 +606,9 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
                 // status pill
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 3),
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: isDone
                         ? const Color(0xFFE8400A).withOpacity(0.1)
@@ -649,8 +673,7 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
             // header
             Container(
               width: double.infinity,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               decoration: const BoxDecoration(
                 color: Color(0xFFE8400A),
                 borderRadius: BorderRadius.only(
@@ -672,8 +695,11 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
                   ),
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.close_rounded,
-                        color: Colors.white, size: 16),
+                    child: const Icon(
+                      Icons.close_rounded,
+                      color: Colors.white,
+                      size: 16,
+                    ),
                   ),
                 ],
               ),
@@ -714,7 +740,9 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
                           color: r.status == 'done'
                               ? const Color(0xFFE8400A).withOpacity(0.1)
@@ -752,13 +780,30 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
                       if (r.age != null)
                         _detailChip('AGE', '${r.age} yrs', Icons.cake_outlined),
                       if (r.gender != null && r.gender!.isNotEmpty)
-                        _detailChip('GENDER', r.gender!, Icons.person_outline_rounded),
-                      if (r.bloodPressure != null && r.bloodPressure!.isNotEmpty)
-                        _detailChip('BP', r.bloodPressure!, Icons.favorite_outline_rounded),
+                        _detailChip(
+                          'GENDER',
+                          r.gender!,
+                          Icons.person_outline_rounded,
+                        ),
+                      if (r.bloodPressure != null &&
+                          r.bloodPressure!.isNotEmpty)
+                        _detailChip(
+                          'BP',
+                          r.bloodPressure!,
+                          Icons.favorite_outline_rounded,
+                        ),
                       if (r.weight != null && r.weight!.isNotEmpty)
-                        _detailChip('WEIGHT', '${r.weight} kg', Icons.monitor_weight_outlined),
+                        _detailChip(
+                          'WEIGHT',
+                          '${r.weight} kg',
+                          Icons.monitor_weight_outlined,
+                        ),
                       if (r.address != null && r.address!.isNotEmpty)
-                        _detailChip('ADDR', r.address!, Icons.location_on_outlined),
+                        _detailChip(
+                          'ADDR',
+                          r.address!,
+                          Icons.location_on_outlined,
+                        ),
                     ],
                   ),
 
@@ -782,7 +827,9 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
                       color: const Color(0xFFECEDEF),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                          color: const Color(0xFFD6D8DB), width: 1),
+                        color: const Color(0xFFD6D8DB),
+                        width: 1,
+                      ),
                     ),
                     child: Text(
                       r.reason,

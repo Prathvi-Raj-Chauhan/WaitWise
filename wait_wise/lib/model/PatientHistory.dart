@@ -1,7 +1,7 @@
 class PatientRecord {
   final String id;
   final String name;
-  final int? age;
+  final String? age;
   final String? gender;
   final String? bloodPressure;
   final String? weight;

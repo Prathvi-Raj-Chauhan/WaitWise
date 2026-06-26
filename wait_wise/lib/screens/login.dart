@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wait_wise/core/app_snackbar.dart';
 import 'package:wait_wise/provider/provider.dart';
-import 'package:wait_wise/screens/register.dart';
-import 'package:wait_wise/screens/role_select_page.dart';
-import 'package:wait_wise/screens/wait_room.dart';
 import 'package:wait_wise/services/authService.dart';
 import 'package:wait_wise/widgets/clinicIdDialog.dart';
 
@@ -32,45 +31,36 @@ class _LoginPageState extends State<LoginPage> {
   void _handleLogin(WidgetRef ref) async {
     setState(() => _isLoading = true);
 
-    final res = await AuthService.login(
-      email: _userController.text.trim(),
-      password: _passController.text.trim(),
-    );
-    if (res == true) {
-      
-      setState(() {
-        _isLoading = true;;
-        
-      });
+    try {
+      await AuthService.login(
+        email: _userController.text.trim(),
+        password: _passController.text.trim(),
+      );
+      // only reaches here on success
       if (mounted) {
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_){
-            return  RoleSelectPage();
-          })
-        );
+        AppSnackbar.success(context, 'Logged in successfully!');
+        context.go('/role-select');
+      }
+    } catch (e) {
+      if (mounted) {
+        AppSnackbar.error(context, e.toString());
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
-    }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
-  void _connect(
-    WidgetRef ref, {
-    required String clinicId,
-  }) {
+  void _connect(WidgetRef ref, {required String clinicId}) {
     final url = "http://localhost:9000";
     if (url.isEmpty) return;
     ref.read(serverUrlProvider.notifier).state = url;
     ref.read(clinicIdProvider.notifier).state = clinicId;
     Future.delayed(const Duration(seconds: 2), () {
-    if (mounted) {
-      setState(() => _isLoading = false);
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => WaitRoom()),
-      );
-    }
-  });
+      if (mounted) {
+        setState(() => _isLoading = false);
+        context.go('/wait-room');
+      }
+    });
   }
 
   @override
@@ -169,11 +159,7 @@ class _LoginPageState extends State<LoginPage> {
                       return GestureDetector(
                         onTap: () async {
                           final clinicId = await showClinicIdDialog(context);
-                          _connect(
-                            ref,
-                            clinicId: clinicId!,
-            
-                          );
+                          _connect(ref, clinicId: clinicId!);
                         },
                         child: Container(
                           width: double.infinity,
@@ -449,7 +435,7 @@ class _LoginPageState extends State<LoginPage> {
                                   onTap: _isLoading
                                       ? null
                                       : () {
-                                          _handleLogin(ref,);
+                                          _handleLogin(ref);
                                         },
                                   child: Container(
                                     width: double.infinity,
@@ -497,12 +483,7 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                       GestureDetector(
                                         onTap: () {
-                                          Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  RegisterPage(),
-                                            ),
-                                          );
+                                          context.push('/register');
                                         },
                                         child: Text(
                                           'REGISTER NOW',

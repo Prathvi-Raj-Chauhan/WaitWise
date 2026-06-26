@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:html' as html;
-import 'dart:js' as js;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -137,8 +136,6 @@ class _WaitRoomState extends State<WaitRoom> {
                           builder: (context, ref, child) {
                             final queue = ref.watch(queueProvider);
                             final hasToken = queue.currentToken != null;
-                            final currentNumber = queue.currentToken?.number
-                                .toString();
                             return Column(
                               children: [
                                 Align(
@@ -210,9 +207,6 @@ class _WaitRoomState extends State<WaitRoom> {
                         child: Consumer(
                           builder: (context, ref, child) {
                             final queue = ref.watch(queueProvider);
-                            final hasToken = queue.currentToken != null;
-                            final currentNumber = queue.currentToken?.number
-                                .toString();
 
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

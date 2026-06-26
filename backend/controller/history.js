@@ -1,6 +1,6 @@
 const { db } = require("../db/index");
 const { appointment, patient, clinic } = require("../db/schema");
-const { eq, and, gte, lte, ilike, sql } = require("drizzle-orm");
+const { eq, and, ilike, sql } = require("drizzle-orm");
 
 // GET /history/:clinicId
 // query params: from, to, name, status
@@ -13,87 +13,58 @@ async function getPatientHistory(req, res) {
       return res.status(400).json({ error: "Clinic ID is required" });
     }
 
-    // build conditions incrementally
     const conditions = [eq(appointment.clinic_id, clinicId)];
 
     if (status && status !== "all") {
       conditions.push(eq(appointment.status, status));
     }
 
-    // addedAt is stored as text (ms string) so cast to bigint for range comparison
     if (from) {
-      const fromMs = new Date(from).setHours(0, 0, 0, 0).toString();
-      conditions.push(
-        sql`CAST(${appointment.addedAt} AS BIGINT) >= ${fromMs}`
-      );
+      const fromMs = new Date(from).setHours(0, 0, 0, 0); // ✅ number, not string
+      conditions.push(sql`CAST(${appointment.added_at} AS BIGINT) >= ${fromMs}`);
     }
 
     if (to) {
-      const toMs = new Date(to).setHours(23, 59, 59, 999).toString();
-      conditions.push(
-        sql`CAST(${appointment.addedAt} AS BIGINT) <= ${toMs}`
-      );
+      const toMs = new Date(to).setHours(23, 59, 59, 999); // ✅ number, not string
+      conditions.push(sql`CAST(${appointment.added_at} AS BIGINT) <= ${toMs}`);
     }
 
-    // build query — join patient to get name, age, gender
-    let query = db
+    if (name && name.trim() !== "") {
+      conditions.push(ilike(patient.name, `%${name.trim()}%`));
+    }
+
+    const whereClause = conditions.length === 1
+      ? conditions[0]
+      : and(...conditions.filter(Boolean));
+
+    const records = await db
       .select({
         id:            appointment.id,
         status:        appointment.status,
         weight:        appointment.weight,
-        blood_pressure: appointment.blood_pressure,
-        addedAt:       appointment.addedAt,
+        bloodPressure: appointment.blood_pressure,
+        added_at:      appointment.added_at,
         name:          patient.name,
         age:           patient.age,
         gender:        patient.gender,
         mobile:        patient.mobile,
-        // reason and address live on appointment since they're per-visit
         reason:        appointment.reason,
-        address:       appointment.address,
+        address:       patient.address, // ✅ address is on patient, not appointment
       })
       .from(appointment)
       .innerJoin(patient, eq(appointment.patient_id, patient.id))
-      .where(and(...conditions))
-      .orderBy(sql`CAST(${appointment.addedAt} AS BIGINT) DESC`);
+      .where(whereClause)
+      .orderBy(sql`CAST(${appointment.added_at} AS BIGINT) DESC`);
 
-    // name filter — applied after join since name is on patient table
-    if (name && name.trim() !== "") {
-      conditions.push(ilike(patient.name, `%${name.trim()}%`));
-      // rebuild with name condition included
-      query = db
-        .select({
-          id:            appointment.id,
-          status:        appointment.status,
-          weight:        appointment.weight,
-          blood_pressure: appointment.blood_pressure,
-          addedAt:       appointment.addedAt,
-          name:          patient.name,
-          age:           patient.age,
-          gender:        patient.gender,
-          mobile:        patient.mobile,
-          reason:        appointment.reason,
-          address:       appointment.address,
-        })
-        .from(appointment)
-        .innerJoin(patient, eq(appointment.patient_id, patient.id))
-        .where(and(...conditions))
-        .orderBy(sql`CAST(${appointment.addedAt} AS BIGINT) DESC`);
-    }
+    return res.status(200).json({ count: records.length, records });
 
-    const records = await query;
-
-    return res.status(200).json({
-      count: records.length,
-      records,
-    });
   } catch (e) {
-    console.error("getPatientHistory error:", e.message);
+    console.error("getPatientHistory error:", e.message, e.cause);
     return res.status(500).json({ error: "Server error", message: e.message });
   }
 }
 
 // GET /history/:clinicId/stats
-// returns quick summary counts for the clinic
 async function getClinicStats(req, res) {
   try {
     const { clinicId } = req.params;

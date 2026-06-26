@@ -1,10 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wait_wise/provider/provider.dart';
-import 'package:wait_wise/screens/doctor_screen.dart';
-import 'package:wait_wise/screens/reception_screen.dart';
 import 'package:wait_wise/widgets/clinicIdDialog.dart';
 
 class RoleSelectPage extends StatefulWidget {
@@ -28,10 +27,7 @@ class _RoleSelectPageState extends State<RoleSelectPage> {
     ref.read(clinicIdProvider.notifier).state = clinicId;
     
     if (mounted) {
-      
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => isReceptionist ? ReceptionPage( clinicId : clinicId)  : DoctorScreen()))
-      ;
+      context.go(isReceptionist ? '/reception/$clinicId' : '/doctor');
     }
   
   }
