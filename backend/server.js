@@ -8,6 +8,10 @@ const PORT = 9000;
 const server = http.createServer(app);
 const authRouter = require("./router/auth");
 const historyRouter = require("./router/history")
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const hpp = require('hpp');
+const xss = require('xss');
 const {
   registerPatientByClinic,
   createAppointmentForPatient,
@@ -16,13 +20,32 @@ const { appointment } = require("./db/schema");
 const { db } = require("./db/index")      // or wherever your db instance lives
 const { eq, and } = require("drizzle-orm")
 require("dotenv").config();
+app.use(helmet());
 app.use(cookieParser())
+
+
+app.use(hpp());
+
+// Global limit
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // max 100 requests per window
+  message: { success: false, message: 'Too many requests, please try again later.' },
+});
+
+// Stricter limit for auth routes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10, // only 10 login attempts per 15 min
+  message: { success: false, message: 'Too many login attempts, please try again later.' },
+});
+
+app.use(globalLimiter);
+
 app.use(
   cors({
     origin: [
-      "http://localhost:50978",
-      "http://localhost:50979",
-      "http://localhost:50980",
+      "https://waitwisebyprc.web.app/"
     ],
     credentials: true,
   }),
@@ -170,8 +193,8 @@ socket.on("connection", (sock) => {
   sock.on("disconnect", () => console.log(`Disconnected: ${sock.id}`));
 });
 
-app.use("/auth", authRouter);
-app.use("/history", historyRouter)
+app.use("/auth", authRouter, globalLimiter);
+app.use("/history", historyRouter, globalLimiter)
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server Started at Port = ${PORT}`);
 });

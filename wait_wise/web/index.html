@@ -1,46 +1,140 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
-
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
-
-  <!-- iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="wait_wise">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WaitWise</title>
+  <link rel="preload" href="flutter.js" as="script">
+  <link rel="preconnect" href="https://waitwise-jaoa.onrender.com">
   <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>wait_wise</title>
   <link rel="manifest" href="manifest.json">
-</head>
-<body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; background: #1a1a1a; }
+
+    #loading-screen {
+      position: fixed; inset: 0;
+      background: #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      z-index: 9999;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+    #loading-screen.hidden { opacity: 0; visibility: hidden; }
+
+    .ww-logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .ww-icon {
+      width: 48px;
+      height: 48px;
+      background: #FF5722;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ww-icon svg { width: 28px; height: 28px; }
+
+    .ww-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 2px;
+    }
+    .ww-name span { color: #FF5722; }
+
+    /* animated bar loader */
+    .ww-bars {
+      display: flex;
+      gap: 6px;
+      align-items: flex-end;
+      height: 32px;
+    }
+    .ww-bar {
+      width: 4px;
+      background: #FF5722;
+      border-radius: 4px;
+      animation: barwave 1.1s ease-in-out infinite;
+    }
+    .ww-bar:nth-child(1) { animation-delay: 0s;    height: 12px; }
+    .ww-bar:nth-child(2) { animation-delay: 0.1s;  height: 20px; }
+    .ww-bar:nth-child(3) { animation-delay: 0.2s;  height: 28px; }
+    .ww-bar:nth-child(4) { animation-delay: 0.3s;  height: 20px; }
+    .ww-bar:nth-child(5) { animation-delay: 0.4s;  height: 12px; }
+    .ww-bar:nth-child(6) { animation-delay: 0.5s;  height: 20px; }
+    .ww-bar:nth-child(7) { animation-delay: 0.6s;  height: 28px; }
+    .ww-bar:nth-child(8) { animation-delay: 0.7s;  height: 20px; }
+    .ww-bar:nth-child(9) { animation-delay: 0.8s;  height: 12px; }
+
+    @keyframes barwave {
+      0%, 100% { transform: scaleY(0.4); opacity: 0.4; }
+      50%       { transform: scaleY(1);   opacity: 1; }
+    }
+
+    .ww-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #555;
+      letter-spacing: 2px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50%       { opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loading-screen">
+
+    <div class="ww-logo">
+      <div class="ww-icon">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="14" cy="10" r="5" stroke="white" stroke-width="2"/>
+          <path d="M6 24c0-4 3.6-7 8-7h0c4.4 0 8 3 8 7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="ww-name">WAIT<span>_</span>WISE</div>
+    </div>
+
+    <div class="ww-bars">
+      <div class="ww-bar"></div>
+      <div class="ww-bar"></div>
+      <div class="ww-bar"></div>
+      <div class="ww-bar"></div>
+      <div class="ww-bar"></div>
+      <div class="ww-bar"></div>
+      <div class="ww-bar"></div>
+      <div class="ww-bar"></div>
+      <div class="ww-bar"></div>
+    </div>
+
+    <div class="ww-status">INITIALIZING . . .</div>
+
+  </div>
+
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      const loader = document.getElementById('loading-screen');
+      loader.classList.add('hidden');
+      setTimeout(() => loader.remove(), 400);
+    });
+  </script>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
