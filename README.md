@@ -149,9 +149,9 @@ Presents two options — Doctor and Reception. Selection is required before proc
 ---
 ## Future Additions
 
-- [ ] All added patients will be Added into the supabase backed Postrgres Database
-- [ ] Additions of patients will be done lazily.
-- [ ] Screen Where Doctors or Receptionist can see old Records of patient.
+- [.] All added patients will be Added into the supabase backed Postrgres Database
+- [.] Additions of patients will be done lazily.
+- [.] Screen Where Doctors or Receptionist can see old Records of patient.
 - [ ] Receptionist can pick the already registered patient and book their appointment.
 - [ ] Doctor can update in a small brief what the appointment was or what they advised, something like that so that they can remember.
 
