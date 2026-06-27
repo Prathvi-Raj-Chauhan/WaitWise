@@ -5,6 +5,26 @@ A real-time clinic queue management system built for small to medium medical pra
 
 ---
 
+Access the web app on - https://waitwisebyprc.web.app
+
+---
+
+## How to Use
+- Register your clinic.
+- Login as a Receptionist.
+- You will see a code in top right corner copy that.
+- Login again in another tab.
+- Login as doctor and paste the copied code to get in sync with receptionist.
+- again on the new tab click on tv wait room screen on login page and enter the code.
+- Now all 3 screens are in sync and data is being added to the backend continuosly.
+
+## Use Case 
+- For clinics who wants to manage their patients records online (in cloud).
+- Want to modernize their patients experience.
+- Queue Management.
+- Better Experience for doctors to see details about upcoming patient early
+- ... and many more
+
 ## What it does
 
 - Reception staff register patients with name, age, gender, BP, weight, reason for visit, and address.
