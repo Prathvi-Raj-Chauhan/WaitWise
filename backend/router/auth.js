@@ -5,9 +5,7 @@ const router = Router()
 
 router.post("/login", clinicLogin)
 router.post("/register", clinicRegister)
-
-
-router.post("/me",  authenticate, (req, res) => {
+router.get("/me",  authenticate, (req, res) => {
     return res.status(200).json({
         status : "verified"
     }); 
