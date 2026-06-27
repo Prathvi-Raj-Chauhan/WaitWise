@@ -66,8 +66,8 @@ async function clinicRegister(req, res) {
     const sanitisedUser = safe;
 
     res.cookie("token", tokens.accessToken, {
-      httpOnly: false,
-      sameSite: "lax",
+      httpOnly: true,
+      sameSite: " one",
       secure: true,
     });
     return res.status(201).json({
@@ -133,8 +133,8 @@ async function clinicLogin(req, res) {
     const { passwordHash, ...safe } = clinicData;
     const sanitisedClinic = safe;
     res.cookie("token", tokens.accessToken, {
-      httpOnly: false,
-      sameSite: "lax",
+      httpOnly: true,
+      sameSite: "none",
       secure: true,
     });
     return res.status(200).json({
