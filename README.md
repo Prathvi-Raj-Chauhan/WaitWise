@@ -90,6 +90,11 @@ Doctor taps CALL_NEXT
 Optimistic update on client (instant UI response)
 Socket "callNext" event --> Server shifts queue, records consult duration
 Server broadcasts new state --> All clients sync
+        |
+        v
+Calls are made in the backend to save the patient and appointment record
+to the supabase, this has nothing to do with rest of functionality so
+gives no additional overheads.
 ```
 
 ---
