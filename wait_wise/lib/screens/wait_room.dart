@@ -15,6 +15,7 @@ class WaitRoom extends StatefulWidget {
 }
 
 class _WaitRoomState extends State<WaitRoom> {
+  final ScrollController _queueScrollController = ScrollController();
   Timer? _timer;
   final now = DateTime.now();
   String currWeek = "";
@@ -22,12 +23,25 @@ class _WaitRoomState extends State<WaitRoom> {
   void initState() {
     super.initState();
     currWeek = week(now.weekday);
-    _timer = Timer.periodic(const Duration(minutes: 1), (_) => setState(() {}));
+    _timer = Timer.periodic(const Duration(minutes: 1), (_) {
+      setState(() {});
+      if (_queueScrollController.hasClients) {
+        final maxScroll = _queueScrollController.position.maxScrollExtent;
+        final current = _queueScrollController.offset;
+        final next = current + 120.0;
+        _queueScrollController.animateTo(
+          next >= maxScroll ? 0 : next,
+          duration: const Duration(milliseconds: 800),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    _queueScrollController.dispose();
     super.dispose();
   }
 
@@ -232,17 +246,33 @@ class _WaitRoomState extends State<WaitRoom> {
                                   child: Divider(color: Colors.grey[300]),
                                 ),
                                 Expanded(
-                                  child: queue.waiting.length == 0 ? Text("Empty") : ListView.builder(
-                                    itemCount: queue.waiting.length,
-                                    itemBuilder: (_, index) {
-                                      return _upnextToken(
-                                        queue.waiting.elementAt(index).number +
-                                            1,
-                                        queue.waiting.elementAt(index).name,
-                                        index % 2 == 0,
-                                      );
-                                    },
-                                  ),
+                                  child: queue.waiting.length == 0
+                                      ? Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            "Empty",
+                                            style: GoogleFonts.jetBrainsMono(
+                                              color: Colors.grey,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        )
+                                      : ListView.builder(
+                                          controller: _queueScrollController,
+                                          itemCount: queue.waiting.length,
+                                          itemBuilder: (_, index) {
+                                            return _upnextToken(
+                                              queue.waiting
+                                                      .elementAt(index)
+                                                      .number +
+                                                  1,
+                                              queue.waiting
+                                                  .elementAt(index)
+                                                  .name,
+                                              index % 2 == 0,
+                                            );
+                                          },
+                                        ),
                                 ),
                               ],
                             );
@@ -365,17 +395,34 @@ class _WaitRoomState extends State<WaitRoom> {
   }
 
   Widget _upnextToken(int token, String name, bool isOdd) {
-    Color col = isOdd ? Colors.deepOrangeAccent : Colors.grey;
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Text("#$token" , style: GoogleFonts.jetBrainsMono(color: col)),
-          Divider(),
-          Text("Name : $name", style: GoogleFonts.jetBrainsMono(color: col)),
-        ],
-      ),
+    final Color col = isOdd ? Colors.deepOrangeAccent : Colors.grey.shade600;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Text(
+                '#$token',
+                style: GoogleFonts.jetBrainsMono(
+                  color: col,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  name,
+                  style: GoogleFonts.jetBrainsMono(color: col, fontSize: 22),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Divider(height: 1, color: Colors.grey[200]),
+      ],
     );
   }
 }
